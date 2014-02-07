@@ -1,23 +1,29 @@
 var WsServer    = require('ws').Server;
-var config = require('./config');
 var gameserver = require('./gameprocess');
+var restify = require('restify');
+var config = require('./config.json');
 
-gameconsole = new WsServer({port: 8080});
+var servers = [];
 
-gameconsole.broadcast = function(data) {
-    for(var i in this.clients)
-        this.clients[i].send(data);
-};
+Object.keys(config.servers).forEach(function(item, index) {
+    data = config.servers[index];
+    servers[index] = new gameserver(data);
+    servers[index].console = new WsServer({port: data.consoleport});
 
-var potato = new gameserver();
-potato.turnon();
-
-// Stream everything out to the console
-potato.on('data', function(data){
-    gameconsole.broadcast(data.toString());
+    servers[index].on('data', function(data){
+        servers[index].broadcast(data.toString());
+    });
 });
 
+var restserver = restify.createServer();
+restserver.get('/gameserver/:id/on', function on(req, res, next){gameserver = servers[index]; gameserver.turnon();res.send('ok')});
+restserver.get('/gameserver/:id/off', function off(req, res, next){gameserver = servers[index]; gameserver.turnoff();res.send('ok')});
+restserver.get('/gameserver/:id/restart', function restart(req, res, next){gameserver = servers[index]; gameserver.restart();res.send('ok')});
+restserver.get('/gameserver/:id/configlist', function configlist(req, res, next){gameserver = servers[index]; res.send(potato.plugin.configlist(potato));});
+restserver.get('/gameserver/:id/maplist', function maplist(req, res, next){gameserver = servers[index]; res.send(gameserver.plugin.maplist(potato));});
+restserver.get('/gameserver/:id/query', function query(req, res, next){gameserver = servers[index]; res.send(gameserver.query());});
 
-setTimeout(function(){
-    potato.restart()
-}, 5 * 1000);
+
+restserver.listen(config.daemon.listenport, function() {
+  console.log('%s listening at %s', restserver.name, restserver.url);
+});

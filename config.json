@@ -1,0 +1,19 @@
+{
+  "daemon" : {
+      "listenport":8000
+  },
+  "servers": [
+      {
+    "consoleport":8001,
+    "eventport":8002,
+	"command_line" : "java",
+	"path" : "./text/",
+	"variables" : {
+	  "-jar":"minecraft_server.jar",
+	  "-Xmx":"512Mb"
+	},
+	"gameport":25565,
+	"plugin":"minecraft"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "GameServerDaemon",
+  "preferGlobal": true,
+  "version": "0.3.0",
+  "author": "Eoin <eoin@gametainers.com>",
+  "description": "a simple daemon to manage game servers",
+  "bin": {
+    "gsd": "gsd"
+  },
+  "scripts": {
+    "start": "node gds.js"
+  },
+  "main": "gsd.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gametainers/gsd.git"
+  },
+  "dependencies" : {
+    "ws"   :  "",
+    "mc-ping" : "",
+    "glob":""
+  },
+  "engines": {
+    "node": ">=0.6"
+  }
+}

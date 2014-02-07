@@ -1,16 +1,16 @@
 var spawn = require('child_process').spawn;
-var config = require('./config');
 var util = require("util");
 var events = require("events");
 var plugins = require("./plugins.js").plugins;
 
 var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3;
 
-function GameServer() {
+function GameServer(config) {
   self = this;
   this.status = OFF;
-  this.commandline = config.server.command_line;
-  this.plugin = plugins[config.server.plugin + '.js']; 
+  this.config = config;
+  this.commandline = config.command_line;
+  this.plugin = plugins[config.plugin + '.js'];
 };
 
 util.inherits(GameServer, events.EventEmitter);
@@ -22,7 +22,7 @@ GameServer.prototype.turnon = function(){
       return      
     }
       
-    this.ps = spawn(config.server.command_line);
+    this.ps = spawn(self.config.server.command_line, ["-jar","minecraft_server.jar"], {cwd: self.config.server.path});
     this.output = this.ps.stdout;
     self.status = STARTING;
 
@@ -30,35 +30,48 @@ GameServer.prototype.turnon = function(){
       output = data.toString();
       console.log(output);
       self.emit('console', output);
+      
+      if (self.status == STARTING){
+	if (output.indexOf(self.plugin.started_trigger) !=-1){
+	  this.status = ON;
+	  console.log("Server started");
+	  self.queryCheck = setInterval(self.plugin.query, 15000, self)
+          self.emit('started');
+	}
+      };
+      
     });
-    
     
     this.ps.on('exit', function(){
       if (self.status == STOPPING){
 	console.log("Process stopped");
-	self.status = OFF;1
+	self.status = OFF;
 	self.emit('off');
         return;	
       }
      
       if (self.status == ON || self.status == STARTING){
-	console.log("Process died a horrible death");
-	self.status = OFF;	
+	    console.log("Process died a horrible death");
+  	    self.status = OFF;
         self.emit('crash');
-	return;
       }
 
     });
     
     this.on('crash', function(){
-      console.log("Restarting after crash");      
-      this.turnon();
+      console.log("Restarting after crash");
+      self.restart();
     });
 }
 
 GameServer.prototype.turnoff = function(){
-  self.status = STOPPING; 
-  this.kill()
+  clearTimeout(self.queryCheck);
+  if (!this.status == OFF){
+    self.status = STOPPING; 
+    this.kill();
+  }else{
+    self.emit('off');
+  }
 }
 
 GameServer.prototype.restart = function(){
@@ -67,11 +80,22 @@ GameServer.prototype.restart = function(){
 }
 
 GameServer.prototype.kill = function(){
-  this.ps.kill();
+    this.ps.kill();
 }
 
 GameServer.prototype.send = function(data){
   this.ps.write(data);
 }
+
+GameServer.prototype.console = function Console(){
+
+}
+
+GameServer.prototype.console.broadcast = function(data) {
+    for(var i in this.clients){
+        this.clients[i].send(data);
+    }
+};
+
 
 module.exports = GameServer;
