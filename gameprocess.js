@@ -2,6 +2,7 @@ var spawn = require('child_process').spawn;
 var util = require("util");
 var events = require("events");
 var plugins = require("./plugins.js").plugins;
+var merge = require("./utls.js").merge;
 
 var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3;
 
@@ -9,8 +10,14 @@ function GameServer(config) {
   self = this;
   this.status = OFF;
   this.config = config;
-  this.commandline = config.command_line;
-  this.plugin = plugins[config.plugin + '.js'];
+  this.joined = ["-Xmx", "-XX:PermSize="];
+  this.plugin = plugins[this.config.plugin + '.js'];
+  this.variables = merge(this.joined, this.plugin.defaultvariables, this.config.variables);
+  this.exe = this.plugin.exe;
+  
+  console.log(this.variables);
+  console.log("done");
+  
 };
 
 util.inherits(GameServer, events.EventEmitter);
@@ -19,10 +26,10 @@ GameServer.prototype.turnon = function(){
     // Shouldn't happen, but does on a crash after restart
     if (!self.status == OFF){
       console.log("Tried to turn on but status is already : " + self.status); 
-      return      
+      return;
     }
-      
-    this.ps = spawn(self.config.server.command_line, ["-jar","minecraft_server.jar"], {cwd: self.config.server.path});
+    
+    this.ps = spawn(this.exe, this.variables, {cwd: self.config.path});
     this.output = this.ps.stdout;
     self.status = STARTING;
 
@@ -73,6 +80,28 @@ GameServer.prototype.turnoff = function(){
     self.emit('off');
   }
 }
+
+
+GameServer.prototype.query = function(){
+  return self.plugin.query()
+}
+
+GameServer.prototype.lastquery = function(){
+  return {"motd":self.hostname, "numplayers":self.numplayers, "maxplayers":self.maxplayers, "lastquery":self.lastquerytime}
+}
+
+GameServer.prototype.configlist = function(){
+  return self.plugin.configlist(self);
+}
+
+GameServer.prototype.maplist = function(){
+  return self.plugin.maplist(self);
+}
+
+GameServer.prototype.info = function(){
+  return {"query":self.lastquery(), "config":self.config, "status":self.status}
+}
+
 
 GameServer.prototype.restart = function(){
   self.once('off', function (stream) {self.turnon()});

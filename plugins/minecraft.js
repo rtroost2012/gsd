@@ -7,30 +7,28 @@ glob = require("glob")
 var settings = {};
 settings.stop_command = 'stop'
 settings.started_trigger = ')! For help, type "help" or "?"'
-settings.defaultCommandLine = {"-jar ":"minecraft_server.jar", "-Xmx":"512Mb"}
+settings.defaultvariables = {"-jar":"minecraft_server.jar", "-Xmx":"512Mb"}
+settings.exe = "java",
 
 settings.query = function query(self){
-  console.log("Querying"); 
-  mcping('localhost', 25565, function(err, res) {
+  var result =  mcping(self.config.gamehost, self.config.gameport, function(err, res) {
     if (err) {
         console.error("Couldn't query server, please check the IP / port are configured correctly and query is enabled");
         self.emit('crash');
-
         return null;
 
     } else {
-        self.hostname = res['server_name'];
+        self.hostname = res['server_name'];	
         self.numplayers = res['num_players'];
         self.maxplayers = res['max_players'];
-        return {"hostname":self.hostname, "numplayers":self.numplayers, "maxplayers":self.maxplayers};
+	self.lastquerytime = new Date().getTime();
     }
-});
-  
+  });  
 };
 
 settings.maplist = function maplist(self){
     maps = [];
-    
+
     fs.readdirSync(self.config.path).forEach(function(directory){
       
       path = pathlib.join(self.config.path, directory); 

@@ -18,7 +18,8 @@
   "dependencies" : {
     "ws"   :  "",
     "mc-ping" : "",
-    "glob":""
+    "glob":"",
+    "restify":""
   },
   "engines": {
     "node": ">=0.6"
