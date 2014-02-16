@@ -50,7 +50,10 @@ settings.configlist = function configlist(self){
     configs['core'] = files;
   });
 
-  if (fs.existsSync(pathlib.join(path, "plugins"))){
+  console.log(pathlib.join(self.config.path, "plugins"));
+  
+  if (fs.existsSync(pathlib.join(self.config.path, "plugins"))){
+    console.log("EXISTS");
     glob("plugins/*/*.yml", {'cwd':self.config.path, 'sync':true}, function (er, files) {
       configs['plugins'] = files;
     });

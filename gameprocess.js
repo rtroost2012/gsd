@@ -4,6 +4,9 @@ var events = require("events");
 var plugins = require("./plugins.js").plugins;
 var merge = require("./utls.js").merge;
 
+var pathlib = require('path');
+var fs = require('fs');
+
 var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3;
 
 function GameServer(config) {
@@ -120,11 +123,28 @@ GameServer.prototype.console = function Console(){
 
 }
 
-GameServer.prototype.console.broadcast = function(data) {
-    for(var i in this.clients){
-        this.clients[i].send(data);
+GameServer.prototype.consolebroadcast = function(data) {
+  console.log("I SHOULD BE SENDING");
+  for(var i in this.console.clients){
+	console.log("I AM SENDING");
+        this.console.clients[i].send(data);
     }
 };
+
+
+GameServer.prototype.readfile = function readfile(f){
+  file = pathlib.join(self.config.path, pathlib.normalize(f));
+  return fs.readFileSync(file, "utf8");
+}
+
+GameServer.prototype.writefile = function writefile(f, contents){
+  file = pathlib.join(self.config.path, pathlib.normalize(f));
+
+}
+
+GameServer.prototype.deletefile = function Console(){
+
+}
 
 
 module.exports = GameServer;

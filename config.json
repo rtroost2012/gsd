@@ -1,10 +1,10 @@
 {
     "daemon": {
-        "listenport": 8000
+        "listenport": 8003
     },
     "servers": [
         {
-            "consoleport": 8001,
+            "consoleport": 8031,
             "eventport": 8002,
             "overide_command_line" : "",
             "path": "./test/",
