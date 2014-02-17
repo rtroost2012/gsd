@@ -19,7 +19,8 @@
     "ws"   :  "",
     "mc-ping" : "",
     "glob":"",
-    "restify":""
+    "restify":"",
+    "socket.io":""
   },
   "engines": {
     "node": ">=0.6"
