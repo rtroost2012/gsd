@@ -10,7 +10,7 @@
             "path": "./test/",
             "variables": {
                 "-jar": "minecraft_server.jar",
-                "-Xmx": "512Mb"
+                "-Xmx": "512M"
             },
             "gameport": 25565,
             "gamehost": "",

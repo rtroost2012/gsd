@@ -1,4 +1,3 @@
-var WsServer    = require('ws').Server;
 var gameserver = require('./gameprocess');
 var restify = require('restify');
 var config = require('./config.json');
@@ -26,7 +25,7 @@ Object.keys(config.servers).forEach(function(item, index) {
 
 
 var restserver = restify.createServer();
-
+restserver.use(restify.bodyParser());
 restserver.use(
   function crossOrigin(req,res,next){
     res.header("Access-Control-Allow-Origin", "*");
@@ -43,7 +42,11 @@ restserver.get('/gameservers/:id/configlist', function configlist(req, res, next
 restserver.get('/gameservers/:id/maplist', function maplist(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.maplist());});
 restserver.get('/gameservers/:id/query', function query(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.lastquery());});
 
-restserver.get(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {gameserver = servers[req.params[0]];res.send(gameserver.readfile(req.params[1]));});
+restserver.post('/gameservers/:id/console', function command(req, res, next){gameserver = servers[req.params.id]; gameserver.send(req.params.command); console.log("D");res.send('ok');});
+
+restserver.get('/gameservers/:id/addonsinstalled', function command(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.addonlist());});
+
+restserver.get(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {gameserver = servers[req.params[0]];res.send({'contents':gameserver.readfile(req.params[1])});});
 restserver.put(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {gameserver = servers[req.params[0]];console.log(req.params); res.send(gameserver.writefile(req.params[1], req.params['file']));});
 
 // TODO : put send

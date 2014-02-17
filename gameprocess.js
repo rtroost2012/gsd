@@ -28,13 +28,16 @@ util.inherits(GameServer, events.EventEmitter);
 GameServer.prototype.turnon = function(){
     // Shouldn't happen, but does on a crash after restart
     if (!self.status == OFF){
-      console.log("Tried to turn on but status is already : " + self.status); 
+      // console.log("Tried to turn on but status is already : " + self.status); 
       return;
     }
     
+    console.log(this.variables);
     this.ps = spawn(this.exe, this.variables, {cwd: self.config.path});
+
     this.output = this.ps.stdout;
     self.status = STARTING;
+
 
     this.output.on('data', function(data){
       output = data.toString();
@@ -101,6 +104,9 @@ GameServer.prototype.maplist = function(){
   return self.plugin.maplist(self);
 }
 
+GameServer.prototype.addonlist = function(){
+  return self.plugin.addonlist(self);
+}
 GameServer.prototype.info = function(){
   return {"query":self.lastquery(), "config":self.config, "status":self.status}
 }
@@ -116,20 +122,13 @@ GameServer.prototype.kill = function(){
 }
 
 GameServer.prototype.send = function(data){
-  this.ps.write(data);
+  console.log(data);
+  this.ps.stdin.write(data + '\n');
 }
 
 GameServer.prototype.console = function Console(){
 
 }
-
-GameServer.prototype.consolebroadcast = function(data) {
-  console.log("I SHOULD BE SENDING");
-  for(var i in this.console.clients){
-	console.log("I AM SENDING");
-        this.console.clients[i].send(data);
-    }
-};
 
 
 GameServer.prototype.readfile = function readfile(f){
@@ -139,7 +138,6 @@ GameServer.prototype.readfile = function readfile(f){
 
 GameServer.prototype.writefile = function writefile(f, contents){
   file = pathlib.join(self.config.path, pathlib.normalize(f));
-
 }
 
 GameServer.prototype.deletefile = function Console(){

@@ -7,7 +7,7 @@ glob = require("glob")
 var settings = {};
 settings.stop_command = 'stop'
 settings.started_trigger = ')! For help, type "help" or "?"'
-settings.defaultvariables = {"-jar":"minecraft_server.jar", "-Xmx":"512Mb"}
+settings.defaultvariables = {"-Xmx":"512M", "-jar":"minecraft_server.jar"}
 settings.exe = "java",
 
 settings.query = function query(self){
@@ -49,17 +49,26 @@ settings.configlist = function configlist(self){
   glob("*.txt", {'cwd':self.config.path, 'sync':true}, function (er, files) {
     configs['core'] = files;
   });
-
-  console.log(pathlib.join(self.config.path, "plugins"));
   
   if (fs.existsSync(pathlib.join(self.config.path, "plugins"))){
-    console.log("EXISTS");
     glob("plugins/*/*.yml", {'cwd':self.config.path, 'sync':true}, function (er, files) {
       configs['plugins'] = files;
     });
   }
   
   return configs;
+};
+
+settings.addonlist = function addonlist(self){
+  var addons = {};
+  
+  if (fs.existsSync(pathlib.join(self.config.path, "plugins"))){
+    glob("plugins/*.jar", {'cwd':self.config.path, 'sync':true}, function (er, files) {
+      addons['bukkit'] = files;
+    });
+  }
+  
+  return addons;
 };
 
 module.exports = settings;

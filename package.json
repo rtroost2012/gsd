@@ -16,7 +16,6 @@
     "url": "https://github.com/gametainers/gsd.git"
   },
   "dependencies" : {
-    "ws"   :  "",
     "mc-ping" : "",
     "glob":"",
     "restify":"",
