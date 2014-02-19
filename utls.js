@@ -12,11 +12,13 @@ function merge(joined, target) {
 	output.push(key,target[key]);	
       }else{
 	output.push(key + target[key]);
-
       }
 
     }
 
+    output = output.filter(function(n){return n});
+
+    console.log(output);
     return output;
 }
 

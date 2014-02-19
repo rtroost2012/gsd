@@ -1,5 +1,5 @@
 
-mcping = require('mc-ping');
+mcping = require('mcquery');
 fs = require('fs');
 pathlib = require('path');
 glob = require("glob")
@@ -11,20 +11,29 @@ settings.defaultvariables = {"-Xmx":"512M", "-jar":"minecraft_server.jar"}
 settings.exe = "java",
 
 settings.query = function query(self){
-  var result =  mcping(self.config.gamehost, self.config.gameport, function(err, res) {
-    if (err) {
-        console.error("Couldn't query server, please check the IP / port are configured correctly and query is enabled");
-        self.emit('crash');
-        return null;
-
-    } else {
-        self.hostname = res['server_name'];	
-        self.numplayers = res['num_players'];
-        self.maxplayers = res['max_players'];
+  var query = new mcping(self.config.gamehost, self.config.gameport);
+  var reqcount=2;
+  
+  query.connect( function(err){
+  if(err){
+    console.error("Couldn't query server, please check the IP / port are configured correctly and query is enabled");
+    self.emit('crash');
+  }
+  else{
+    query.full_stat(function(err, res){
+        self.hostname = res['hostname'];	
+        self.numplayers = res['numplayers'];
+        self.maxplayers = res['maxplayers'];
+	self.map        = res['map'];
+	self.players    = res['player_'];
 	self.lastquerytime = new Date().getTime();
-    }
-  });  
+      
+    });
+  }
+})
+  
 };
+
 
 settings.maplist = function maplist(self){
     maps = [];
@@ -45,10 +54,15 @@ settings.maplist = function maplist(self){
 
 settings.configlist = function configlist(self){
   var configs = {};
+  configs['core'] = [];
   
   glob("*.txt", {'cwd':self.config.path, 'sync':true}, function (er, files) {
-    configs['core'] = files;
+    configs['core'] = configs['core'].concat(files);
   });
+  
+  if (fs.existsSync(pathlib.join(self.config.path, "server.properties"))){
+    configs['core'] = configs['core'].concat("server.properties")
+  }
   
   if (fs.existsSync(pathlib.join(self.config.path, "plugins"))){
     glob("plugins/*/*.yml", {'cwd':self.config.path, 'sync':true}, function (er, files) {

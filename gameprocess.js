@@ -3,7 +3,8 @@ var util = require("util");
 var events = require("events");
 var plugins = require("./plugins.js").plugins;
 var merge = require("./utls.js").merge;
-
+var download = require('download');
+var usage = require('usage');
 var pathlib = require('path');
 var fs = require('fs');
 
@@ -12,6 +13,7 @@ var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3;
 function GameServer(config) {
   self = this;
   this.status = OFF;
+  this.initialized = false;
   this.config = config;
   this.joined = ["-Xmx", "-XX:PermSize="];
   this.plugin = plugins[this.config.plugin + '.js'];
@@ -37,44 +39,51 @@ GameServer.prototype.turnon = function(){
 
     this.output = this.ps.stdout;
     self.status = STARTING;
-
-
-    this.output.on('data', function(data){
-      output = data.toString();
-      console.log(output);
-      self.emit('console', output);
+    
+    self.pid = this.ps.pid
+    usage.clearHistory(self.pid);
+    
+    if (!self.initialized){
+      this.output.on('data', function(data){
+	output = data.toString();
+	console.log(output);
+	self.emit('console', output);
+	
+	if (self.status == STARTING){
+	  if (output.indexOf(self.plugin.started_trigger) !=-1){
+	    this.status = ON;
+	    console.log("Server started");
+	    self.queryCheck = setInterval(self.plugin.query, 15000, self)
+	    self.statCheck = setInterval(self.procStats, 10000, self)
+	    self.procStats.usage = {}
+	    self.emit('started');
+	  }
+	};
+	
+      });
       
-      if (self.status == STARTING){
-	if (output.indexOf(self.plugin.started_trigger) !=-1){
-	  this.status = ON;
-	  console.log("Server started");
-	  self.queryCheck = setInterval(self.plugin.query, 15000, self)
-          self.emit('started');
+      this.ps.on('exit', function(){
+	if (self.status == STOPPING){
+	  console.log("Process stopped");
+	  self.status = OFF;
+	  self.emit('off');
+	  return;	
 	}
-      };
       
-    });
-    
-    this.ps.on('exit', function(){
-      if (self.status == STOPPING){
-	console.log("Process stopped");
-	self.status = OFF;
-	self.emit('off');
-        return;	
-      }
-     
-      if (self.status == ON || self.status == STARTING){
-	    console.log("Process died a horrible death");
-  	    self.status = OFF;
-        self.emit('crash');
-      }
+	if (self.status == ON || self.status == STARTING){
+	      console.log("Process died a horrible death");
+	      self.status = OFF;
+	  self.emit('crash');
+	}
 
-    });
-    
-    this.on('crash', function(){
-      console.log("Restarting after crash");
-      self.restart();
-    });
+      });
+      
+      this.on('crash', function(){
+	console.log("Restarting after crash");
+	self.restart();
+      });
+      self.initialized = true;
+    }
 }
 
 GameServer.prototype.turnoff = function(){
@@ -88,12 +97,20 @@ GameServer.prototype.turnoff = function(){
 }
 
 
+
 GameServer.prototype.query = function(){
   return self.plugin.query()
 }
 
+GameServer.prototype.procStats = function(self){
+  usage.lookup(self.pid, {keepHistory: true}, function(err, result) {
+    console.log(result);
+    self.procStats.usage = result;
+  });
+}
+
 GameServer.prototype.lastquery = function(){
-  return {"motd":self.hostname, "numplayers":self.numplayers, "maxplayers":self.maxplayers, "lastquery":self.lastquerytime}
+  return {"motd":self.hostname, "numplayers":self.numplayers, "maxplayers":self.maxplayers, "lastquery":self.lastquerytime, "map":self.map, "players":self.players}
 }
 
 GameServer.prototype.configlist = function(){
@@ -108,7 +125,7 @@ GameServer.prototype.addonlist = function(){
   return self.plugin.addonlist(self);
 }
 GameServer.prototype.info = function(){
-  return {"query":self.lastquery(), "config":self.config, "status":self.status}
+  return {"query":self.lastquery(), "config":self.config, "status":self.status, "pid":self.pid, "process":self.procStats.usage}
 }
 
 
@@ -138,7 +155,17 @@ GameServer.prototype.readfile = function readfile(f){
 
 GameServer.prototype.writefile = function writefile(f, contents){
   file = pathlib.join(self.config.path, pathlib.normalize(f));
+  fs.writeFile(file, contents);
 }
+
+GameServer.prototype.downloadfile = function downloadfile(url, path){
+    path = pathlib.join(self.config.path, pathlib.normalize(path));
+   
+    //TODO : Work out when to extract (zip etc...) , { extract: true }
+    download(url, path);
+    return 'ok';
+}
+
 
 GameServer.prototype.deletefile = function Console(){
 

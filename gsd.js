@@ -47,8 +47,14 @@ restserver.post('/gameservers/:id/console', function command(req, res, next){gam
 restserver.get('/gameservers/:id/addonsinstalled', function command(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.addonlist());});
 
 restserver.get(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {gameserver = servers[req.params[0]];res.send({'contents':gameserver.readfile(req.params[1])});});
-restserver.put(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {gameserver = servers[req.params[0]];console.log(req.params); res.send(gameserver.writefile(req.params[1], req.params['file']));});
-
+restserver.put(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {
+  if ('contents' in req.params){    
+    gameserver = servers[req.params[0]];res.send(gameserver.writefile(req.params[1], req.params['contents']));
+  }
+  if ('url' in req.params){
+    gameserver = servers[req.params[0]];res.send(gameserver.downloadfile(req.params['url'], req.params[1]));
+  }
+});
 // TODO : put send
 
 

@@ -19,7 +19,9 @@
     "mc-ping" : "",
     "glob":"",
     "restify":"",
-    "socket.io":""
+    "socket.io":"",
+    "download":"",
+    "mcquery":""
   },
   "engines": {
     "node": ">=0.6"
