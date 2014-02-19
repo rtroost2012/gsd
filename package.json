@@ -21,7 +21,8 @@
     "restify":"",
     "socket.io":"",
     "download":"",
-    "mcquery":""
+    "mcquery":"",
+    "usage":""
   },
   "engines": {
     "node": ">=0.6"
