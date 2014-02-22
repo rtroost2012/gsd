@@ -43,7 +43,7 @@ GameServer.prototype.turnon = function(){
     self.pid = this.ps.pid
     usage.clearHistory(self.pid);
     
-    if (!self.initialized){
+
       this.output.on('data', function(data){
 	output = data.toString();
 	console.log(output);
@@ -53,9 +53,9 @@ GameServer.prototype.turnon = function(){
 	  if (output.indexOf(self.plugin.started_trigger) !=-1){
 	    this.status = ON;
 	    console.log("Server started");
-	    self.queryCheck = setInterval(self.plugin.query, 15000, self)
-	    self.statCheck = setInterval(self.procStats, 10000, self)
-	    self.procStats.usage = {}
+	    self.queryCheck = setInterval(self.plugin.query, 15000, self);
+	    self.statCheck = setInterval(self.procStats, 10000, self);
+	    self.procStats.usage = {};
 	    self.emit('started');
 	  }
 	};
@@ -73,6 +73,7 @@ GameServer.prototype.turnon = function(){
 	if (self.status == ON || self.status == STARTING){
 	      console.log("Process died a horrible death");
 	      self.status = OFF;
+	  self.emit('off');
 	  self.emit('crash');
 	}
 
@@ -82,8 +83,15 @@ GameServer.prototype.turnon = function(){
 	console.log("Restarting after crash");
 	self.restart();
       });
-      self.initialized = true;
-    }
+      
+      this.on('off', function clearup(){
+	clearInterval(self.queryCheck);
+	clearInterval(self.statCheck);
+	self.procStats.usage = {};
+	self.pid = undefined;
+      })
+	
+
 }
 
 GameServer.prototype.turnoff = function(){
