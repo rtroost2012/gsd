@@ -14,13 +14,21 @@ Object.keys(config.servers).forEach(function(item, index) {
 	servers[index].console.sockets.emit('console', {'l':data.toString()});
     });
     
-    servers[index].console.sockets.on('connection', function (socket) {
-      servers[index].console.on('sendconsole', function (command) {
-	console.log(command);
-      });
+    servers[index].on('off', function(data){
+	servers[index].console.sockets.emit('console', {'l':data.toString()});
     });
 
+    servers[index].on('statuschange', function(data) {
+	servers[index].console.sockets.emit('statuschange', {'status':servers[index].status});
+    });
+    
+    servers[index].console.on('sendconsole', function (command) {
+	console.log(command);
+    });
+      
 });
+    
+
 
 
 

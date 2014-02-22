@@ -13,7 +13,6 @@ var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3;
 function GameServer(config) {
   self = this;
   this.status = OFF;
-  this.initialized = false;
   this.config = config;
   this.joined = ["-Xmx", "-XX:PermSize="];
   this.plugin = plugins[this.config.plugin + '.js'];
@@ -34,15 +33,13 @@ GameServer.prototype.turnon = function(){
       return;
     }
     
-    console.log(this.variables);
     this.ps = spawn(this.exe, this.variables, {cwd: self.config.path});
 
     this.output = this.ps.stdout;
-    self.status = STARTING;
+    self.setStatus(STARTING);
+    console.log(self.status);
     
     self.pid = this.ps.pid
-    usage.clearHistory(self.pid);
-    
 
       this.output.on('data', function(data){
 	output = data.toString();
@@ -51,7 +48,7 @@ GameServer.prototype.turnon = function(){
 	
 	if (self.status == STARTING){
 	  if (output.indexOf(self.plugin.started_trigger) !=-1){
-	    this.status = ON;
+	    self.setStatus(ON);
 	    console.log("Server started");
 	    self.queryCheck = setInterval(self.plugin.query, 15000, self);
 	    self.statCheck = setInterval(self.procStats, 10000, self);
@@ -65,14 +62,14 @@ GameServer.prototype.turnon = function(){
       this.ps.on('exit', function(){
 	if (self.status == STOPPING){
 	  console.log("Process stopped");
-	  self.status = OFF;
+	  self.setStatus(OFF);
 	  self.emit('off');
 	  return;	
 	}
       
 	if (self.status == ON || self.status == STARTING){
-	      console.log("Process died a horrible death");
-	      self.status = OFF;
+	  console.log("Process died a horrible death");
+	  self.setStatus(OFF);
 	  self.emit('off');
 	  self.emit('crash');
 	}
@@ -88,6 +85,7 @@ GameServer.prototype.turnon = function(){
 	clearInterval(self.queryCheck);
 	clearInterval(self.statCheck);
 	self.procStats.usage = {};
+	usage.clearHistory(self.pid);
 	self.pid = undefined;
       })
 	
@@ -97,13 +95,18 @@ GameServer.prototype.turnon = function(){
 GameServer.prototype.turnoff = function(){
   clearTimeout(self.queryCheck);
   if (!this.status == OFF){
-    self.status = STOPPING; 
+    self.setStatus(STOPPING); 
     this.kill();
   }else{
     self.emit('off');
   }
 }
 
+GameServer.prototype.setStatus = function(status){
+  self.status = status
+  self.emit('statuschange');
+  return self.status;  
+}
 
 
 GameServer.prototype.query = function(){
