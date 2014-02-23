@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+import sys
+import glob
+import os
+
+action = sys.argv[1]
+
+if action == "getlist":
+  print '{"craftbukkit":["latest"]}'
+  sys.exit(0)
+  
+gamemode = sys.argv[2]
+path = sys.argv[3]
+
+gamemode_list = [ os.path.basename(f)[:-3] for f in glob.glob(os.path.join(os.path.dirname(__file__), 'installables')+"/*.py")]
+gamemode_list.remove("__init__")
+
+if gamemode in gamemode_list:
+    exec("from installables.%s import GameMode as gamemodule" % (gamemode))
+
+gamemode = gamemodule(path)
+
+if action == "install":
+  print "INSTALLING"
+  gamemode.install()
+  print "INSTALLED"
+  
+elif action == "uninstall":
+  gamemode.uninstall()

@@ -7,8 +7,9 @@ var download = require('download');
 var usage = require('usage');
 var pathlib = require('path');
 var fs = require('fs');
+var exec = require('child_process').exec
 
-var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3;
+var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3; CHANGING_GAMEMODE = 4;
 
 function GameServer(config) {
   self = this;
@@ -75,7 +76,7 @@ GameServer.prototype.turnon = function(){
 	}
 
       });
-      
+
       this.on('crash', function(){
 	console.log("Restarting after crash");
 	self.restart();
@@ -115,7 +116,9 @@ GameServer.prototype.query = function(){
 
 GameServer.prototype.procStats = function(self){
   usage.lookup(self.pid, {keepHistory: true}, function(err, result) {
-    console.log(result);
+    // TODO : Return as % of os.totalmem() (optional)
+    // TODO : Return as % of ram max setting
+    
     self.procStats.usage = result;
   });
 }
@@ -182,5 +185,37 @@ GameServer.prototype.deletefile = function Console(){
 
 }
 
+GameServer.prototype.getgamemodes = function getgamemode(res){
+  managerlocation = pathlib.join(__dirname,"gamemodes",self.config.plugin,"gamemodemanager");
+  child = exec(managerlocation + ' getlist',
+  function (error, stdout, stderr) {
+    res.send(JSON.parse(stdout));
+  });
+}
 
+GameServer.prototype.installgamemode = function installgamemode(){
+  managerlocation = pathlib.join(__dirname,"gamemodes",self.config.plugin,"gamemodemanager");
+  if (self.status == ON){
+    self.turnoff();
+    console.log("HERE");
+  }
+  self.setStatus(CHANGING_GAMEMODE);
+  console.log(self.config.path)
+  installer = spawn(managerlocation, ["install", "craftbukkit", self.config.path], {cwd: self.config.path});
+  
+  console.log(managerlocation);
+  
+  installer.stdout.on('data', function(data){
+    console.log(data);
+    self.emit('console',data);
+  });
+      
+  installer.on('exit', function(){
+    self.setStatus(OFF);
+  });
+}
+
+GameServer.prototype.removegamemode = function Console(){
+  this.ps = spawn(this.exe, [self.config.path], {cwd: self.config.path});
+}
 module.exports = GameServer;

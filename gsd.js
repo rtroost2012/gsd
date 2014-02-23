@@ -14,10 +14,6 @@ Object.keys(config.servers).forEach(function(item, index) {
 	servers[index].console.sockets.emit('console', {'l':data.toString()});
     });
     
-    servers[index].on('off', function(data){
-	servers[index].console.sockets.emit('console', {'l':data.toString()});
-    });
-
     servers[index].on('statuschange', function(data) {
 	servers[index].console.sockets.emit('statuschange', {'status':servers[index].status});
     });
@@ -65,6 +61,9 @@ restserver.put(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {
 });
 // TODO : put send
 
+restserver.get('/gameservers/:id/gamemodes', function command(req, res, next){gameserver = servers[req.params.id]; gameserver.getgamemode(res);});
+restserver.put('/gameservers/:id/gamemodes', function command(req, res, next){gameserver = servers[req.params.id]; gameserver.installgamemode(req.params['gamemode']); res.send("ok");});
+restserver.del('/gameservers/:id/gamemodes', function command(req, res, next){gameserver = servers[req.params.id]; gameserver.getgamemode(res);});
 
 
 restserver.listen(config.daemon.listenport, function() {
