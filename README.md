@@ -17,7 +17,9 @@ These instructions are for ubuntu, but should work on any system.
 
 First lets install NodeJS and the required packages
 ```sh
-apt-get install nodejs npm
+sudo add-apt-repository ppa:chris-lea/node.js
+apt-get update
+apt-get install nodejs make g++
 ```
 Clone GSD
 ```sh
