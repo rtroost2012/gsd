@@ -19,7 +19,7 @@ First lets install NodeJS and the required packages
 ```sh
 sudo add-apt-repository ppa:chris-lea/node.js
 apt-get update
-apt-get install nodejs make g++
+apt-get install nodejs make g++ git
 ```
 Clone GSD
 ```sh
@@ -27,7 +27,8 @@ git clone https://github.com/gametainers/gsd.git
 ```
 Download the required nodejs packages
 ```sh
-git clone https://github.com/gametainers/gsd.git
+cd gsd
+npm install
 npm start
 ```
 Configure the supplied config.json file with your server information.
