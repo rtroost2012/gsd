@@ -1,4 +1,5 @@
 var spawn = require('child_process').spawn;
+var pty = require('pty.js');
 var util = require("util");
 var events = require("events");
 var plugins = require("./plugins.js").plugins;
@@ -34,15 +35,14 @@ GameServer.prototype.turnon = function(){
       return;
     }
     
-    this.ps = spawn(this.exe, this.variables, {cwd: self.config.path});
+    this.ps = pty.spawn(this.exe, this.variables, {cwd: self.config.path});
 
-    this.output = this.ps.stdout;
     self.setStatus(STARTING);
     console.log(self.status);
     
     self.pid = this.ps.pid
 
-      this.output.on('data', function(data){
+      this.ps.on('data', function(data){
 	output = data.toString();
 	console.log(output);
 	self.emit('console', output);
@@ -154,7 +154,7 @@ GameServer.prototype.kill = function(){
 
 GameServer.prototype.send = function(data){
   console.log(data);
-  this.ps.stdin.write(data + '\n');
+  this.ps.write(data + '\n');
 }
 
 GameServer.prototype.console = function Console(){

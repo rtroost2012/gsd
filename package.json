@@ -23,7 +23,8 @@
     "socket.io":"",
     "download":"",
     "mcquery":"",
-    "usage":""
+    "usage":"",
+    "pty.js":""
   },
   "engines": {
     "node": ">=0.6"
