@@ -17,6 +17,7 @@
   },
   "dependencies" : {
     "mc-ping" : "",
+    "gamedig" : "",
     "glob":"",
     "restify":"",
     "socket.io":"",

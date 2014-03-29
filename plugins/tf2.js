@@ -1,0 +1,61 @@
+
+srcdsquery = require('gamedig');
+fs = require('fs');
+pathlib = require('path');
+glob = require('glob')
+
+var settings = {};
+settings.stop_command = 'stop'
+settings.started_trigger = 'Connection to Steam servers successful'
+settings.defaultvariables = {"+map":"ctf_2fort"}
+settings.exe = "srcds_run",
+
+settings.query = function query(self){
+  Gamedig.query(
+    {
+        type: 'tf2',
+        host: 'self.config.gamehost',
+	port: self.config.gameport
+    },
+    function(state) {
+        if(state.error) self.emit('crash');;
+        else console.log(state);
+    }
+);
+  
+};
+
+
+settings.maplist = function maplist(self){
+    maps = [];
+    mapspath = pathlib.join(self.config.path, "tf/maps/*.bsp"); 
+    
+    if (fs.existsSync(mapspath)){
+      glob("*.bsp", {'cwd':mapspath, 'sync':true}, function (er, files) {
+	maps = files
+      });
+    }
+    
+    return maps;
+};
+
+settings.configlist = function configlist(self){
+  var configs = {};
+  configs['core'] = [];
+  
+  glob("tf/cfg/*.cfg", {'cwd':self.config.path, 'sync':true}, function (er, files) {
+    configs['core'] = configs['core'].concat(files);
+  });
+  
+  
+  return configs;
+};
+
+settings.addonlist = function addonlist(self){
+  var addons = {};
+  
+  
+  return addons;
+};
+
+module.exports = settings;
