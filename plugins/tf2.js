@@ -7,21 +7,26 @@ glob = require('glob')
 var settings = {};
 settings.stop_command = 'stop'
 settings.started_trigger = 'Connection to Steam servers successful'
-settings.defaultvariables = {"+map":"ctf_2fort"}
-settings.exe = "srcds_run",
+settings.defaultvariables = {"+map":"ctf_2fort", "-game":"tf"}
+settings.exe = "./srcds_wrap",
 
 settings.query = function query(self){
   Gamedig.query(
     {
         type: 'tf2',
-        host: 'self.config.gamehost',
+        host: self.config.gamehost,
 	port: self.config.gameport
     },
-    function(state) {
-        if(state.error){
+    function(res) {
+        if(res.error){
 	  self.emit('crash');
 	}else{
-	  console.log(state);
+	  self.hostname = res['name'];	
+	  self.numplayers = res['numplayers'];
+	  self.maxplayers = res['maxplayers'];
+	  self.map        = res['map'];
+	  self.players    = res['players'];
+	  self.lastquerytime = new Date().getTime();
 	}
     }
 );
