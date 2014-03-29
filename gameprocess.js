@@ -206,6 +206,7 @@ GameServer.prototype.installgamemode = function installgamemode(){
   console.log(managerlocation);
   
   installer.stdout.on('data', function(data){
+    if (data == "\r\n"){return}
     console.log(data);
     self.emit('console',data);
   });
