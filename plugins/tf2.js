@@ -18,8 +18,11 @@ settings.query = function query(self){
 	port: self.config.gameport
     },
     function(state) {
-        if(state.error) self.emit('crash');;
-        else console.log(state);
+        if(state.error){
+	  self.emit('crash');
+	}else{
+	  console.log(state);
+	}
     }
 );
   
