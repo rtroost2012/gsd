@@ -2,6 +2,9 @@
     "daemon": {
         "listenport": 8003
     },
+    "tokens": [
+	    "123"
+    ],    
     "servers": [
         {
             "consoleport": 8031,
