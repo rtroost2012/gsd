@@ -5,17 +5,18 @@ var restify = require('restify');
 
 function authenticate(req, res, next) {
     //
-    if (!('x-access-token' in req.headers)){
-      console.log('notauth');
-      return new restify.NotAuthorizedError()
+    if (!('X-Access-Token' in req.headers)){
+      console.log('not authenticated, missing header');
+      return next(restify.NotAuthorizedError());
     }
        
-    token = req.headers['x-access-token']
+    token = req.headers['X-Access-Token']
        
     if (config.tokens.indexOf(token) > -1){
       return next();
     }else{
-      return new restify.NotAuthorizedError()
+      console.log('not authenticated, wrong auth');      
+      return next(restify.NotAuthorizedError());
     }
 }
 
