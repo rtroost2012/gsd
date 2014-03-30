@@ -28,6 +28,7 @@ Object.keys(config.servers).forEach(function(item, index) {
 var restserver = restify.createServer();
 restserver.use(restify.bodyParser());
 restserver.use(restify.authorizationParser());
+restserver.on('MethodNotAllowed', unknownMethodHandler);
 restserver.use(authenticate);
 
 restserver.use(
@@ -38,7 +39,6 @@ restserver.use(
   }
 );
 
-restserver.on('MethodNotAllowed', unknownMethodHandler);
 
 
 
