@@ -22,7 +22,7 @@ settings.query = function query(self){
 	  self.emit('crash');
 	}else{
 	  self.hostname = res['name'];	
-	  self.numplayers = res['numplayers'];
+	  self.numplayers = res['players'].length;
 	  self.maxplayers = res['maxplayers'];
 	  self.map        = res['map'];
 	  self.players    = res['players'];
