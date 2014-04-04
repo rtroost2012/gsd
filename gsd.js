@@ -3,6 +3,8 @@ var restify = require('restify');
 var config = require('./config.json');
 var unknownMethodHandler = require('./utls.js').unknownMethodHandler;
 var authenticate = require('./auth.js').authenticate;
+var fs = require('fs');
+
 var servers = [];
 
 Object.keys(config.servers).forEach(function(item, index) {
@@ -51,21 +53,34 @@ restserver.get('/gameservers/', function info(req, res, next){
   res.send(response);
 });
 
+restserver.post('/gameservers/', function(req, res, next) {
+  config.servers.push(JSON.parse(req.params['settings']));
+  
+  // TODO : ACTUALLY SETUP HERE
+  
+  fs.writeFile("config.json", JSON.stringify(config, null, 4), function(err) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("JSON saved to " + outputFilename);
+    }
+  }); 
+  
+  res.send('ok');
+}
+
 restserver.get('/gameservers/:id', function info(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.info());});
 restserver.put('/gameservers/:id', function info(req, res, next){
   gameserver = servers[req.params.id];
 
   config.servers[req.params.id].variables = req.params['variables']
   console.log(config.servers[req.params.id])
-    
-  //config.servers[req.params.id].consoleport = req.params['consoleport']
-  //config.servers[req.params.id].overide_command_line = req.params['overide_command_line']
-  //config.servers[req.params.id].path = req.params['path']
-  //config.servers[req.params.id].gameport = req.params['gameport']
-  //config.servers[req.params.id].gamehost = req.params['gamehost']
-
+  
   res.send(gameserver.info());
 });
+
+
+
 
 restserver.get('/gameservers/:id/on', function on(req, res, next){gameserver = servers[req.params.id]; gameserver.turnon();res.send('ok')});
 restserver.get('/gameservers/:id/off', function off(req, res, next){gameserver = servers[req.params.id]; gameserver.turnoff();res.send('ok')});
