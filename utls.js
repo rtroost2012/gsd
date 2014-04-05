@@ -22,6 +22,16 @@ function merge(joined, target) {
     return output;
 }
 
+function saveconfig(config){
+  fs.writeFile("config.json", JSON.stringify(config, null, 4), function(err) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("JSON saved to " + outputFilename);
+    }
+  }); 
+}
+
 function unknownMethodHandler(req, res) {
   if (req.method.toLowerCase() === 'options') {
     console.log('received an options method request');
@@ -38,5 +48,6 @@ function unknownMethodHandler(req, res) {
     return res.send(new restify.MethodNotAllowedError());
 }
 
+exports.saveconfig = saveconfig;
 exports.merge = merge;
 exports.unknownMethodHandler = unknownMethodHandler;

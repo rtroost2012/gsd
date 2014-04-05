@@ -2,6 +2,7 @@ var gameserver = require('./gameprocess');
 var restify = require('restify');
 var config = require('./config.json');
 var unknownMethodHandler = require('./utls.js').unknownMethodHandler;
+var saveconfig = require('./utls.js').saveconfig;
 var authenticate = require('./auth.js').authenticate;
 var fs = require('fs');
 
@@ -53,23 +54,19 @@ restserver.get('/gameservers/', function info(req, res, next){
   res.send(response);
 });
 
-restserver.post('/gameservers/', function(req, res, next) {
-  config.servers.push(JSON.parse(req.params['settings']));
-  
-  // TODO : ACTUALLY SETUP HERE
-  
-  fs.writeFile("config.json", JSON.stringify(config, null, 4), function(err) {
-    if(err) {
-      console.log(err);
-    } else {
-      console.log("JSON saved to " + outputFilename);
-    }
-  }); 
-  
-  res.send('ok');
-}
+restserver.post('/gameservers/', function info(req, res, next){
+  id = config.servers.push(JSON.parse(req.params['settings']));
+  saveconfig(config);
+  res.send(String(id - 1));
+});
 
-restserver.get('/gameservers/:id', function info(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.info());});
+
+restserver.get('/gameservers/:id', function (req, res, next){
+  gameserver = servers[req.params.id];
+  res.send(gameserver.info());
+});
+
+
 restserver.put('/gameservers/:id', function info(req, res, next){
   gameserver = servers[req.params.id];
 
