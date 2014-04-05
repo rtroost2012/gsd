@@ -5,6 +5,10 @@ var restify = require('restify');
 
 function authenticate(req, res, next) {
     //
+    if (!('X-Access-Token' in req.headers) && 'x-access-token' in req.headers){
+      req.headers['X-Access-Token'] = req.headers['x-access-token']
+    }
+    
     if (!('X-Access-Token' in req.headers)){
       console.log('not authenticated, missing header');
       return next(restify.NotAuthorizedError());
