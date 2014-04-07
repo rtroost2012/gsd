@@ -33,6 +33,9 @@ settings.query = function query(self){
   
 };
 
+settings.install = function(){
+  
+}
 
 settings.maplist = function maplist(self){
     maps = [];

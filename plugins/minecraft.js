@@ -1,8 +1,9 @@
-
 mcping = require('mcquery');
 fs = require('fs');
 pathlib = require('path');
-glob = require("glob")
+glob = require('glob')
+easy_install = require('../create.js').easy_install;
+var async = require('async');
 
 var settings = {};
 settings.stop_command = 'stop'
@@ -15,10 +16,10 @@ settings.query = function query(self){
   var reqcount=2;
   
   query.connect( function(err){
-  if(err){
-    console.error("Couldn't query server, please check the IP / port are configured correctly and query is enabled");
-    self.emit('crash');
-  }
+    if(err){
+      console.error("Couldn't query server, please check the IP / port are configured correctly and query is enabled");
+      self.emit('crash');
+    }
   else{
     query.full_stat(function(err, res){
         self.hostname = res['hostname'];	
@@ -34,6 +35,9 @@ settings.query = function query(self){
   
 };
 
+settings.install = function(server){
+  easy_install(server, "/mnt/Minecraft/", []);
+}
 
 settings.maplist = function maplist(self){
     maps = [];

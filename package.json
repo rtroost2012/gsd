@@ -24,7 +24,8 @@
     "download":"",
     "mcquery":"",
     "usage":"",
-    "pty.js":""
+    "pty.js":"",
+    "async":""
   },
   "engines": {
     "node": ">=0.6"

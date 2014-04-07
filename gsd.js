@@ -5,11 +5,15 @@ var unknownMethodHandler = require('./utls.js').unknownMethodHandler;
 var saveconfig = require('./utls.js').saveconfig;
 var authenticate = require('./auth.js').authenticate;
 var fs = require('fs');
-
 var servers = [];
 
 Object.keys(config.servers).forEach(function(item, index) {
+    initServer(index);
+});
+
+function initServer(index){
     data = config.servers[index];
+      
     servers[index] = new gameserver(data);
     
     servers[index].console = require('socket.io').listen(data.consoleport);
@@ -25,8 +29,7 @@ Object.keys(config.servers).forEach(function(item, index) {
     servers[index].console.on('sendconsole', function (command) {
 	console.log(command);
     });
-      
-});
+}
 
 var restserver = restify.createServer();
 restserver.use(restify.bodyParser());
@@ -42,9 +45,6 @@ restserver.use(
   }
 );
 
-
-
-
 restserver.get('/gameservers/', function info(req, res, next){
   response = [];
   servers.forEach(
@@ -56,10 +56,26 @@ restserver.get('/gameservers/', function info(req, res, next){
 
 restserver.post('/gameservers/', function info(req, res, next){
   id = config.servers.push(JSON.parse(req.params['settings']));
+
+  // Stupid java indexes
+  id = id - 1;
+  
   saveconfig(config);
-  res.send(String(id - 1));
+  initServer(id);
+  gameserver = servers[id];
+  gameserver.create();
+  res.send(String(id));
 });
 
+restserver.del('/gameservers/:id', function info(req, res, next){
+  gameserver = servers[req.params.id];
+  // TODO: if on, turn off
+  gameserver.delete();
+
+  id = config.servers.splice(req.params.id,1);
+  saveconfig(config);
+  res.send("ok");
+});
 
 restserver.get('/gameservers/:id', function (req, res, next){
   gameserver = servers[req.params.id];
@@ -110,4 +126,6 @@ restserver.listen(config.daemon.listenport, function() {
   console.log('%s listening at %s', restserver.name, restserver.url);
 });
 
+gameserver = servers[0];
+gameserver.create();
 

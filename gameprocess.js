@@ -8,7 +8,10 @@ var download = require('download');
 var usage = require('usage');
 var pathlib = require('path');
 var fs = require('fs');
-var exec = require('child_process').exec
+var exec = require('child_process').exec;
+var createUser = require("./create.js").createUser
+var deleteUser = require("./create.js").deleteUser
+var async = require('async');
 
 var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3; CHANGING_GAMEMODE = 4;
 
@@ -38,7 +41,6 @@ GameServer.prototype.turnon = function(){
     this.ps = pty.spawn(this.exe, this.variables, {cwd: self.config.path});
 
     self.setStatus(STARTING);
-    console.log(self.status);
     
     self.pid = this.ps.pid
 
@@ -103,6 +105,25 @@ GameServer.prototype.turnoff = function(){
   }
 }
 
+GameServer.prototype.create = function(){
+  var config = this.config;
+  var _this = this;
+  
+  async.series([
+    function(callback) {
+      createUser(config.user, config.path, function cb(){callback(null);});
+    },
+    function(callback) {
+      _this.plugin.install(_this);
+      callback(null); 
+    }
+  ]);
+}
+
+GameServer.prototype.delete = function(){
+  deleteUser(this.config.user);
+}
+
 GameServer.prototype.setStatus = function(status){
   self.status = status
   self.emit('statuschange');
@@ -139,7 +160,7 @@ GameServer.prototype.addonlist = function(){
   return self.plugin.addonlist(self);
 }
 GameServer.prototype.info = function(){
-  return {"query":self.lastquery(), "config":self.config, "status":self.status, "pid":self.pid, "process":self.procStats.usage}
+  return {"query":self.lastquery(), "config":self.config, "status":self.status, "pid":self.pid, "process":self.procStats.usage, "variables":self.variables}
 }
 
 
