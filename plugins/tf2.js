@@ -33,8 +33,8 @@ settings.query = function query(self){
   
 };
 
-settings.install = function(){
-  easy_install(server, "/mnt/TF2/", ["tf/cfg/mapcycle*", "tf/cfg/motd*","tf/cfg/replay*"]);
+settings.install = function(server, callback){
+  easy_install(server, "/mnt/TF2/", ["tf/cfg/*.cfg","tf/cfg/mapcycle*", "tf/cfg/motd*","tf/cfg/replay*"], callback);
 }
 
 settings.maplist = function maplist(self){

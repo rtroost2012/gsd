@@ -9,9 +9,12 @@ var usage = require('usage');
 var pathlib = require('path');
 var fs = require('fs');
 var exec = require('child_process').exec;
-var createUser = require("./create.js").createUser
-var deleteUser = require("./create.js").deleteUser
+var createUser = require("./create.js").createUser;
+var deleteUser = require("./create.js").deleteUser;
+var fixperms = require("./create.js").fixperms;
+
 var async = require('async');
+
 
 var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3; CHANGING_GAMEMODE = 4;
 
@@ -114,9 +117,12 @@ GameServer.prototype.create = function(){
       createUser(config.user, config.path, function cb(){callback(null);});
     },
     function(callback) {
-      _this.plugin.install(_this);
+      _this.plugin.install(_this, function cb(){callback(null);});
+    },
+    function(callback) {
+      fixperms(_this);
       callback(null); 
-    }
+    }    
   ]);
 }
 
@@ -200,7 +206,7 @@ GameServer.prototype.downloadfile = function downloadfile(url, path){
     download(url, path);
     return 'ok';
 }
-
+ 
 
 GameServer.prototype.deletefile = function Console(){
 
