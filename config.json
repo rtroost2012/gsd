@@ -7,8 +7,9 @@
     ],    
     "servers": [
         {
+            "name":"test server",
+            "user":"test user",
             "consoleport": 8031,
-            "eventport": 8002,
             "overide_command_line" : "",
             "path": "./test/",
             "variables": {
