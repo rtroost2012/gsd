@@ -8,6 +8,7 @@
     "servers": [
         {
             "name":"test server",
+            "user":"test user",
             "consoleport": 8031,
             "overide_command_line" : "",
             "path": "./test/",
