@@ -6,6 +6,7 @@ var saveconfig = require('./utls.js').saveconfig;
 var authenticate = require('./auth.js').authenticate;
 var fs = require('fs');
 var servers = [];
+var plugins = require('./plugins').plugins;
 
 Object.keys(config.servers).forEach(function(item, index) {
     initServer(index);
@@ -44,6 +45,17 @@ restserver.use(
     return next();
   }
 );
+
+restserver.get('/', function info(req, res, next){
+  _plugins = {}
+  for (var key in plugins) {
+    settings = plugins[key];
+    _plugins[settings.name] = {"file":key.slice(0, -3)};
+  }
+  response = {'plugins':_plugins};
+  res.send(response);
+});
+
 
 restserver.get('/gameservers/', function info(req, res, next){
   response = [];
@@ -125,7 +137,3 @@ restserver.del('/gameservers/:id/gamemodes', function command(req, res, next){ga
 restserver.listen(config.daemon.listenport, function() {
   console.log('%s listening at %s', restserver.name, restserver.url);
 });
-
-gameserver = servers[0];
-gameserver.create();
-

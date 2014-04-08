@@ -6,6 +6,7 @@ easy_install = require('../create.js').easy_install;
 var async = require('async');
 
 var settings = {};
+settings.name = "Minecraft"
 settings.stop_command = 'stop'
 settings.started_trigger = ')! For help, type "help" or "?"'
 settings.defaultvariables = {"-Xmx":"512M", "-jar":"minecraft_server.jar"}
@@ -35,8 +36,9 @@ settings.query = function query(self){
   
 };
 
-settings.install = function(server){
-  easy_install(server, "/mnt/Minecraft/", []);
+settings.install = function(server, callback){
+
+  easy_install(server, "/mnt/MC/", [], function(){callback()});
 }
 
 settings.maplist = function maplist(self){

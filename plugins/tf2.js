@@ -5,6 +5,7 @@ pathlib = require('path');
 glob = require('glob')
 
 var settings = {};
+settings.name = "Team Fortress 2"
 settings.stop_command = 'stop'
 settings.started_trigger = 'Connection to Steam servers successful'
 settings.defaultvariables = {"+map":"ctf_2fort", "-game":"tf"}
