@@ -101,7 +101,7 @@ restserver.put('/gameservers/:id', function info(req, res, next){
   gameserver = servers[req.params.id];
 
   config.servers[req.params.id].variables = req.params['variables']
-  console.log(config.servers[req.params.id])
+  saveconfig(config);
   
   res.send(gameserver.info());
 });
