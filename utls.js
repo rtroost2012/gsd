@@ -13,27 +13,27 @@ function executeCommand(command, callback){
   });  
 }
 
-function merge(joined, target) {
-    var sources = [].slice.call(arguments, 2);
+function merge(joinedCliCommands) {
+    var sources = [].slice.call(arguments, 1);
+    var variables = [];
+    
     sources.forEach(function (source) {
-        for (var prop in source) {
-            target[prop] = source[prop];
+        for (var key in source) {
+            variables[key] = source[key];
         }
     });
     
     output = [];
-    for (var key in target) {
-      if (joined.indexOf(key)==-1){	
-	output.push(key,target[key]);	
+    for (var key in variables) {
+      if (joinedCliCommands.indexOf(key)==-1){	
+	output.push(key,variables[key]);	
       }else{
-	output.push(key + target[key]);
+	output.push(key + variables[key]);
       }
 
     }
 
     output = output.filter(function(n){return n});
-
-    console.log(output);
     return output;
 }
 
