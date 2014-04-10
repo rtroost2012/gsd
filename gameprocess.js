@@ -138,7 +138,7 @@ GameServer.prototype.setStatus = function(status){
 
 
 GameServer.prototype.query = function(){
-  return self.plugin.query()
+  return this.plugin.query()
 }
 
 GameServer.prototype.procStats = function(self){
@@ -151,7 +151,7 @@ GameServer.prototype.procStats = function(self){
 }
 
 GameServer.prototype.lastquery = function(){
-  return {"motd":self.hostname, "numplayers":self.numplayers, "maxplayers":self.maxplayers, "lastquery":self.lastquerytime, "map":self.map, "players":self.players}
+  return {"motd":this.hostname, "numplayers":this.numplayers, "maxplayers":this.maxplayers, "lastquery":this.lastquerytime, "map":this.map, "players":this.players}
 }
 
 GameServer.prototype.configlist = function(){
@@ -166,7 +166,7 @@ GameServer.prototype.addonlist = function(){
   return self.plugin.addonlist(self);
 }
 GameServer.prototype.info = function(){
-  return {"query":self.lastquery(), "config":self.config, "status":self.status, "pid":self.pid, "process":self.procStats.usage, "variables":self.variables}
+  return {"query":this.lastquery(), "config":this.config, "status":this.status, "pid":this.pid, "process":this.procStats.usage, "variables":this.variables}
 }
 
 
