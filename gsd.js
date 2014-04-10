@@ -12,6 +12,8 @@ Object.keys(config.servers).forEach(function(item, index) {
     initServer(index);
 });
 
+
+
 function initServer(index){
     data = config.servers[index];
       
@@ -60,7 +62,7 @@ restserver.get('/', function info(req, res, next){
 restserver.get('/gameservers/', function info(req, res, next){
   response = [];
   servers.forEach(
-    function(gameserver){ 
+    function(gameserver){
       response.push(gameserver.info());
     });
   res.send(response);
@@ -76,7 +78,7 @@ restserver.post('/gameservers/', function info(req, res, next){
   initServer(id);
   gameserver = servers[id];
   gameserver.create();
-  res.send(String(id));
+  res.send({"id":String(id)});
 });
 
 restserver.del('/gameservers/:id', function info(req, res, next){
