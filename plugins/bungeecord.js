@@ -4,6 +4,7 @@ pathlib = require('path');
 glob = require("glob")
 
 var settings = {};
+settings.name = "Bungeecord"
 settings.stop_command = 'end'
 settings.started_trigger = '[INFO] Listening on'
 settings.defaultvariables = {"-Xmx":"256M", "-jar":"BungeeCord.jar"}
