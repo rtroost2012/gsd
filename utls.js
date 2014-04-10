@@ -1,3 +1,18 @@
+var restify = require('restify');
+var exec = require('child_process').exec;
+
+function executeCommand(command, callback){
+  exec(command,
+    function (error, stdout, stderr) {
+      console.log('stdout: ' + stdout);
+      console.log('stderr: ' + stderr);
+      if (error !== null) {
+	console.log('exec error: ' + error);
+      }
+      callback();
+  });  
+}
+
 function merge(joined, target) {
     var sources = [].slice.call(arguments, 2);
     sources.forEach(function (source) {
@@ -48,6 +63,7 @@ function unknownMethodHandler(req, res) {
     return res.send(new restify.MethodNotAllowedError());
 }
 
+exports.executeCommand = executeCommand;
 exports.saveconfig = saveconfig;
 exports.merge = merge;
 exports.unknownMethodHandler = unknownMethodHandler;

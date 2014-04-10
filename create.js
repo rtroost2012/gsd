@@ -3,53 +3,38 @@ var async = require('async');
 var pathlib = require('path');
 var fs = require('fs');
 var ncp = require('ncp').ncp;
-
-String.prototype.format = function() {
-    var formatted = this;
-    for( var arg in arguments ) {
-        formatted = formatted.replace("{" + arg + "}", arguments[arg]);
-    }
-    return formatted;
-};
-
+var format = require('util').format;
+var executeCommand = require('./utls').executeCommand;
 
 function createUser(username, home, callback){
   // TODO : check if user exists first
-  exec("useradd -m -d {0} -s /bin/bash -G exe {1}".format(home, username),
-    function (error, stdout, stderr) {
-      console.log('stdout: ' + stdout);
-      console.log('stderr: ' + stderr);
-      if (error !== null) {
-	console.log('exec error: ' + error);
-      }
-      callback();
-  });
+  // useradd -m -d {0} -s /bin/bash -G exe {1}
+  command = format("useradd -m -d %s -s /bin/bash %s", home, username);
+  executeCommand(command, callback)
 }
 
 function deleteUser(username){
   // TODO : check if user exists first
-  exec("deluser --remove-home {0}".format(username),
-    function (error, stdout, stderr) {
-      console.log('stdout: ' + stdout);
-      console.log('stderr: ' + stderr);
-      if (error !== null) {
-	console.log('exec error: ' + error);
-      }
-  });  
+  command = format("deluser --remove-home %s", username);
+  executeCommand(command, callback)
 }
 
 
 function linkDir(from_path, to_path, callback){
-  exec("cp -s -u -R {0}/* {1}".format(from_path, to_path),
-    function (error, stdout, stderr) {
-      console.log('stdout: ' + stdout);
-      console.log('stderr: ' + stderr);
-      if (error !== null) {
-	console.log('exec error: ' + error);
-      }
-      callback();
-  });
+  command = format("cp -s -u -R %s/* %s", from_path, to_path);
+  executeCommand(command, callback)
 }
+
+
+function fixperms(gameserver){
+  callback = function(){};
+  
+  command = format("find %s -type d -exec chown %s {} \\;", from_path, to_path);
+  executeCommand(command, callback)
+  
+  command = format("find %s -type d -exec chown %s {} \\;", from_path, to_path);
+  executeCommand(command, callback)
+};
 
 function replaceFiles(base_folder, files, backing_folder, callback){
   finalfiles = [];
@@ -96,7 +81,6 @@ function replaceFiles(base_folder, files, backing_folder, callback){
 }
 
 function easy_install(gameserver, from_path, replacements, parentcallback){
-  
   async.series([
     function(callback) {
       linkDir(from_path, gameserver.config.path, function(){callback(null)});
@@ -109,24 +93,6 @@ function easy_install(gameserver, from_path, replacements, parentcallback){
   ], function(err, results){parentcallback();});
 }
 
-function fixperms(gameserver){
-  exec('find {0} -type d -exec chown {1} {} \\;'.format(gameserver.config.path, gameserver.config.user),
-    function (error, stdout, stderr) {
-      console.log('stdout: ' + stdout);
-      console.log('stderr: ' + stderr);
-      if (error !== null) {
-	console.log('exec error: ' + error);
-      }
-  });
-  exec('find {0} -type f -exec chown {1} {} \\;'.format(gameserver.config.path, gameserver.config.user),
-    function (error, stdout, stderr) {
-      console.log('stdout: ' + stdout);
-      console.log('stderr: ' + stderr);
-      if (error !== null) {
-	console.log('exec error: ' + error);
-      }
-  }); 
-};
 
 exports.fixperms = fixperms;
 exports.easy_install = easy_install;
