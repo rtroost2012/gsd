@@ -36,75 +36,75 @@ util.inherits(GameServer, events.EventEmitter);
 
 GameServer.prototype.turnon = function(){
     // Shouldn't happen, but does on a crash after restart
-    if (!self.status == OFF){
+    if (!this.status == OFF){
       // console.log("Tried to turn on but status is already : " + self.status); 
       return;
     }
     
-    this.ps = pty.spawn(this.exe, this.variables, {cwd: self.config.path});
+    this.ps = pty.spawn(this.exe, this.variables, {cwd: this.config.path});
 
-    self.setStatus(STARTING);
+    this.setStatus(STARTING);
     
-    self.pid = this.ps.pid
+    this.pid = this.ps.pid
 
       this.ps.on('data', function(data){
 	output = data.toString();
 	console.log(output);
-	self.emit('console', output);
+	this.emit('console', output);
 	
-	if (self.status == STARTING){
-	  if (output.indexOf(self.plugin.started_trigger) !=-1){
-	    self.setStatus(ON);
+	if (this.status == STARTING){
+	  if (output.indexOf(this.plugin.started_trigger) !=-1){
+	    this.setStatus(ON);
 	    console.log("Server started");
-	    self.queryCheck = setInterval(self.plugin.query, 15000, self);
-	    self.statCheck = setInterval(self.procStats, 10000, self);
-	    self.procStats.usage = {};
-	    self.emit('started');
+	    this.queryCheck = setInterval(this.plugin.query, 15000, this);
+	    this.statCheck = setInterval(this.procStats, 10000);
+	    this.procStats.usage = {};
+	    this.emit('started');
 	  }
 	};
 	
       });
       
       this.ps.on('exit', function(){
-	if (self.status == STOPPING){
+	if (this.status == STOPPING){
 	  console.log("Process stopped");
-	  self.setStatus(OFF);
-	  self.emit('off');
+	  this.setStatus(OFF);
+	  this.emit('off');
 	  return;	
 	}
       
-	if (self.status == ON || self.status == STARTING){
+	if (this.status == ON || this.status == STARTING){
 	  console.log("Process died a horrible death");
-	  self.setStatus(OFF);
-	  self.emit('off');
-	  self.emit('crash');
+	  this.setStatus(OFF);
+	  this.emit('off');
+	  this.emit('crash');
 	}
 
       });
 
       this.on('crash', function(){
 	console.log("Restarting after crash");
-	self.restart();
+	this.restart();
       });
       
       this.on('off', function clearup(){
-	clearInterval(self.queryCheck);
-	clearInterval(self.statCheck);
-	self.procStats.usage = {};
-	usage.clearHistory(self.pid);
-	self.pid = undefined;
+	clearInterval(this.queryCheck);
+	clearInterval(this.statCheck);
+	this.procStats.usage = {};
+	usage.clearHistory(this.pid);
+	this.pid = undefined;
       })
 	
 
 }
 
 GameServer.prototype.turnoff = function(){
-  clearTimeout(self.queryCheck);
+  clearTimeout(this.queryCheck);
   if (!this.status == OFF){
-    self.setStatus(STOPPING); 
+    this.setStatus(STOPPING); 
     this.kill();
   }else{
-    self.emit('off');
+    this.emit('off');
   }
 }
 
@@ -131,9 +131,9 @@ GameServer.prototype.delete = function(){
 }
 
 GameServer.prototype.setStatus = function(status){
-  self.status = status
-  self.emit('statuschange');
-  return self.status;  
+  this.status = status
+  this.emit('statuschange');
+  return this.status;  
 }
 
 
@@ -141,12 +141,12 @@ GameServer.prototype.query = function(){
   return this.plugin.query()
 }
 
-GameServer.prototype.procStats = function(self){
-  usage.lookup(self.pid, {keepHistory: true}, function(err, result) {
+GameServer.prototype.procStats = function(){
+  usage.lookup(this.pid, {keepHistory: true}, function(err, result) {
     // TODO : Return as % of os.totalmem() (optional)
     // TODO : Return as % of ram max setting
     
-    self.procStats.usage = result;
+    this.procStats.usage = result;
   });
 }
 
@@ -155,15 +155,15 @@ GameServer.prototype.lastquery = function(){
 }
 
 GameServer.prototype.configlist = function(){
-  return self.plugin.configlist(self);
+  return this.plugin.configlist(this);
 }
 
 GameServer.prototype.maplist = function(){
-  return self.plugin.maplist(self);
+  return this.plugin.maplist(this);
 }
 
 GameServer.prototype.addonlist = function(){
-  return self.plugin.addonlist(self);
+  return this.plugin.addonlist(this);
 }
 GameServer.prototype.info = function(){
   return {"query":this.lastquery(), "config":this.config, "status":this.status, "pid":this.pid, "process":this.procStats.usage, "variables":this.variables}
@@ -171,7 +171,7 @@ GameServer.prototype.info = function(){
 
 
 GameServer.prototype.restart = function(){
-  self.once('off', function (stream) {self.turnon()});
+  this.once('off', function (stream) {this.turnon()});
   this.turnoff();
 }
 
@@ -222,28 +222,28 @@ GameServer.prototype.getgamemodes = function getgamemode(res){
 
 GameServer.prototype.installgamemode = function installgamemode(){
   managerlocation = pathlib.join(__dirname,"gamemodes",this.config.plugin,"gamemodemanager");
-  if (self.status == ON){
-    self.turnoff();
+  if (this.status == ON){
+    this.turnoff();
     console.log("HERE");
   }
-  self.setStatus(CHANGING_GAMEMODE);
-  console.log(self.config.path)
-  installer = spawn(managerlocation, ["install", "craftbukkit", self.config.path], {cwd: self.config.path});
+  this.setStatus(CHANGING_GAMEMODE);
+  console.log(this.config.path)
+  installer = spawn(managerlocation, ["install", "craftbukkit", this.config.path], {cwd: this.config.path});
   
   console.log(managerlocation);
   
   installer.stdout.on('data', function(data){
     if (data == "\r\n"){return}
     console.log(data);
-    self.emit('console',data);
+    this.emit('console',data);
   });
       
   installer.on('exit', function(){
-    self.setStatus(OFF);
+    this.setStatus(OFF);
   });
 }
 
 GameServer.prototype.removegamemode = function Console(){
-  this.ps = spawn(this.exe, [self.config.path], {cwd: self.config.path});
+  this.ps = spawn(this.exe, [this.config.path], {cwd: this.config.path});
 }
 module.exports = GameServer;
