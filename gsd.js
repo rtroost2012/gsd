@@ -16,9 +16,7 @@ Object.keys(config.servers).forEach(function(item, index) {
 
 function initServer(index){
     data = config.servers[index];
-      
     servers[index] = new gameserver(data);
-    
     servers[index].console = require('socket.io').listen(data.consoleport);
 
     servers[index].on('console', function(data){
@@ -62,8 +60,8 @@ restserver.get('/', function info(req, res, next){
 restserver.get('/gameservers/', function info(req, res, next){
   response = [];
   servers.forEach(
-    function(gameserver){
-      response.push(gameserver.info());
+    function(service){
+      response.push(service.info());
     });
   res.send(response);
 });
@@ -73,18 +71,17 @@ restserver.post('/gameservers/', function info(req, res, next){
 
   // Stupid java indexes
   id = id - 1;
-  
-  saveconfig(config);
+  saveconfig(config); 
   initServer(id);
-  gameserver = servers[id];
-  gameserver.create();
+  service = servers[id];
+  service.create();
   res.send({"id":String(id)});
 });
 
 restserver.del('/gameservers/:id', function info(req, res, next){
-  gameserver = servers[req.params.id];
+  service = servers[req.params.id];
   // TODO: if on, turn off
-  gameserver.delete();
+  service.delete();
 
   id = config.servers.splice(req.params.id,1);
   saveconfig(config);
@@ -92,48 +89,48 @@ restserver.del('/gameservers/:id', function info(req, res, next){
 });
 
 restserver.get('/gameservers/:id', function (req, res, next){
-  gameserver = servers[req.params.id];
-  res.send(gameserver.info());
+  service = servers[req.params.id];
+  res.send(service.info());
 });
 
 
 restserver.put('/gameservers/:id', function info(req, res, next){
-  gameserver = servers[req.params.id];
+  service = servers[req.params.id];
 
-  config.servers[req.params.id].variables = req.params['variables']
+  config.servers[req.params.id].variables = req.params['variables'];
   saveconfig(config);
   
-  res.send(gameserver.info());
+  res.send(service.info());
 });
 
 
 
 
-restserver.get('/gameservers/:id/on', function on(req, res, next){gameserver = servers[req.params.id]; gameserver.turnon();res.send('ok')});
-restserver.get('/gameservers/:id/off', function off(req, res, next){gameserver = servers[req.params.id]; gameserver.turnoff();res.send('ok')});
-restserver.get('/gameservers/:id/restart', function restart(req, res, next){gameserver = servers[req.params.id]; gameserver.restart();res.send('ok')});
-restserver.get('/gameservers/:id/configlist', function configlist(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.configlist());});
-restserver.get('/gameservers/:id/maplist', function maplist(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.maplist());});
-restserver.get('/gameservers/:id/query', function query(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.lastquery());});
+restserver.get('/services/:id/on', function on(req, res, next){service = servers[req.params.id]; service.turnon();res.send('ok')});
+restserver.get('/services/:id/off', function off(req, res, next){service = servers[req.params.id]; service.turnoff();res.send('ok')});
+restserver.get('/services/:id/restart', function restart(req, res, next){service = servers[req.params.id]; service.restart();res.send('ok')});
+restserver.get('/services/:id/configlist', function configlist(req, res, next){service = servers[req.params.id]; res.send(service.configlist());});
+restserver.get('/services/:id/maplist', function maplist(req, res, next){service = servers[req.params.id]; res.send(service.maplist());});
+restserver.get('/services/:id/query', function query(req, res, next){service = servers[req.params.id]; res.send(service.lastquery());});
 
-restserver.post('/gameservers/:id/console', function command(req, res, next){gameserver = servers[req.params.id]; gameserver.send(req.params.command); res.send('ok');});
+restserver.post('/services/:id/console', function command(req, res, next){service = servers[req.params.id]; service.send(req.params.command); res.send('ok');});
 
-restserver.get('/gameservers/:id/addonsinstalled', function command(req, res, next){gameserver = servers[req.params.id]; res.send(gameserver.addonlist());});
+restserver.get('/services/:id/addonsinstalled', function command(req, res, next){service = servers[req.params.id]; res.send(service.addonlist());});
 
-restserver.get(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {gameserver = servers[req.params[0]];res.send({'contents':gameserver.readfile(req.params[1])});});
-restserver.put(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {
+restserver.get(/^\/services\/(\d+)\/file\/(.+)/, function(req, res, next) {service = servers[req.params[0]];res.send({'contents':service.readfile(req.params[1])});});
+restserver.put(/^\/services\/(\d+)\/file\/(.+)/, function(req, res, next) {
   if ('contents' in req.params){
-    gameserver = servers[req.params[0]];res.send(gameserver.writefile(req.params[1], req.params['contents']));
+    service = servers[req.params[0]];res.send(service.writefile(req.params[1], req.params['contents']));
   }
   if ('url' in req.params){
-    gameserver = servers[req.params[0]];res.send(gameserver.downloadfile(req.params['url'], req.params[1]));
+    service = servers[req.params[0]];res.send(service.downloadfile(req.params['url'], req.params[1]));
   }
 });
 // TODO : put send
 
-restserver.get('/gameservers/:id/gamemodes', function command(req, res, next){gameserver = servers[req.params.id]; gameserver.getgamemodes(res);});
-restserver.put('/gameservers/:id/gamemodes', function command(req, res, next){gameserver = servers[req.params.id]; gameserver.installgamemode(req.params['gamemode']); res.send("ok");});
-restserver.del('/gameservers/:id/gamemodes', function command(req, res, next){gameserver = servers[req.params.id]; gameserver.getgamemode(res);});
+restserver.get('/services/:id/gamemodes', function command(req, res, next){service = servers[req.params.id]; service.getgamemodes(res);});
+restserver.put('/services/:id/gamemodes', function command(req, res, next){service = servers[req.params.id]; service.installgamemode(req.params['gamemode']); res.send("ok");});
+restserver.del('/services/:id/gamemodes', function command(req, res, next){service = servers[req.params.id]; service.getgamemode(res);});
 
 
 restserver.listen(config.daemon.listenport, function() {
