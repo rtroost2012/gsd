@@ -19,7 +19,6 @@ var async = require('async');
 var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3; CHANGING_GAMEMODE = 4;
 
 function GameServer(config) {
-  self = this;
   this.status = OFF;
   this.config = config;
   this.joined = ["-Xmx", "-XX:PermSize="];
@@ -30,7 +29,10 @@ function GameServer(config) {
 
 util.inherits(GameServer, events.EventEmitter);
 
+
 GameServer.prototype.turnon = function(){
+    var self = this;
+    
     // Shouldn't happen, but does on a crash after restart
     if (!this.status == OFF){
       // console.log("Tried to turn on but status is already : " + self.status); 
@@ -41,82 +43,79 @@ GameServer.prototype.turnon = function(){
 
     this.setStatus(STARTING);
     
+
     this.pid = this.ps.pid
 
-      this.ps.on('data', function(data){
-	output = data.toString();
-	console.log(output);
-	this.emit('console', output);
-	
-	if (this.status == STARTING){
-	  if (output.indexOf(this.plugin.started_trigger) !=-1){
-	    this.setStatus(ON);
-	    console.log("Server started");
-	    this.queryCheck = setInterval(this.plugin.query, 15000, this);
-	    this.statCheck = setInterval(this.procStats, 10000);
-	    this.procStats.usage = {};
-	    this.emit('started');
-	  }
-	};
-	
-      });
-      
-      this.ps.on('exit', function(){
-	if (this.status == STOPPING){
-	  console.log("Process stopped");
-	  this.setStatus(OFF);
-	  this.emit('off');
-	  return;	
+    this.ps.on('data', function(data){
+      output = data.toString();
+      console.log("from proc" + output);
+      self.emit("console", output);
+      if (self.status == STARTING){
+	if (output.indexOf(self.plugin.started_trigger) !=-1){
+	  self.setStatus(ON);
+	  console.log("Server started");
+	  self.queryCheck = setInterval(self.plugin.query, 15000, self);
+	  self.statCheck = setInterval(self.procStats, 10000, self);
+	  self.usagestats = {};
+	  self.emit('started');
 	}
+      };
+    });
       
-	if (this.status == ON || this.status == STARTING){
-	  console.log("Process died a horrible death");
-	  this.setStatus(OFF);
-	  this.emit('off');
-	  this.emit('crash');
-	}
-
-      });
-
-      this.on('crash', function(){
-	console.log("Restarting after crash");
-	this.restart();
-      });
+    this.ps.on('exit', function(){
+      if (self.status == STOPPING){
+	console.log("Process stopped");
+	self.setStatus(OFF);
+	self.emit('off');
+	return;	
+      }
       
-      this.on('off', function clearup(){
-	clearInterval(this.queryCheck);
-	clearInterval(this.statCheck);
-	this.procStats.usage = {};
-	usage.clearHistory(this.pid);
-	this.pid = undefined;
-      })
-	
+      if (self.status == ON || self.status == STARTING){
+	console.log("Process died a horrible death");
+	self.setStatus(OFF);
+	self.emit('off');
+	self.emit('crash');
+      }
+    });
 
+    this.on('crash', function(){
+      console.log("Restarting after crash");
+      self.restart();
+    });
+      
+    this.on('off', function clearup(){
+      clearInterval(self.queryCheck);
+      clearInterval(self.statCheck);
+      self.usagestats = {};
+      usage.clearHistory(self.pid);
+      self.pid = undefined;
+    });
 }
 
 GameServer.prototype.turnoff = function(){
-  clearTimeout(this.queryCheck);
-  if (!this.status == OFF){
-    this.setStatus(STOPPING); 
-    this.kill();
+  var self = this;
+  clearTimeout(self.queryCheck);
+  if (!self.status == OFF){
+    self.setStatus(STOPPING); 
+    self.kill();
   }else{
-    this.emit('off');
+    self.emit('off');
   }
 }
 
 GameServer.prototype.create = function(){
   var config = this.config;
-  var _this = this;
+  var self = this;
   
   async.series([
     function(callback) {
       createUser(config.user, config.path, function cb(){callback(null);});
     },
     function(callback) {
-      _this.plugin.install(_this, function cb(){callback(null);});
+      self.plugin.install(self, function cb(){callback(null);});
     },
     function(callback) {
-      fixperms(_this);
+      fixperms(self);
       callback(null); 
     }    
   ]);
@@ -137,12 +136,14 @@ GameServer.prototype.query = function(){
   return this.plugin.query()
 }
 
-GameServer.prototype.procStats = function(){
-  usage.lookup(this.pid, {keepHistory: true}, function(err, result) {
+GameServer.prototype.procStats = function(self){
+  usage.lookup(self.pid, {keepHistory: true}, function(err, result) {
     // TODO : Return as % of os.totalmem() (optional)
     // TODO : Return as % of ram max setting
-    
-    this.procStats.usage = result;
+
+    self.usagestats = result;
+    console.log(result);
+    console.log(self.usagestats);
   });
 }
 
@@ -162,7 +163,7 @@ GameServer.prototype.addonlist = function(){
   return this.plugin.addonlist(this);
 }
 GameServer.prototype.info = function(){
-  return {"query":this.lastquery(), "config":this.config, "status":this.status, "pid":this.pid, "process":this.procStats.usage, "variables":this.variables}
+  return {"query":this.lastquery(), "config":this.config, "status":this.status, "pid":this.pid, "process":this.usagestats, "variables":this.variables}
 }
 
 
@@ -186,17 +187,17 @@ GameServer.prototype.console = function Console(){
 
 
 GameServer.prototype.readfile = function readfile(f){
-  file = pathlib.join(this.config.path, pathlib.normalize(f));
+  file = pathlib.join(self.config.path, pathlib.normalize(f));
   return fs.readFileSync(file, "utf8");
 }
 
 GameServer.prototype.writefile = function writefile(f, contents){
-  file = pathlib.join(this.config.path, pathlib.normalize(f));
+  file = pathlib.join(self.config.path, pathlib.normalize(f));
   fs.writeFile(file, contents);
 }
 
 GameServer.prototype.downloadfile = function downloadfile(url, path){
-    path = pathlib.join(this.config.path, pathlib.normalize(path));
+    path = pathlib.join(self.config.path, pathlib.normalize(path));
    
     //TODO : Work out when to extract (zip etc...) , { extract: true }
     download(url, path);
@@ -209,7 +210,7 @@ GameServer.prototype.deletefile = function Console(){
 }
 
 GameServer.prototype.getgamemodes = function getgamemode(res){
-  managerlocation = pathlib.join(__dirname,"gamemodes",this.config.plugin,"gamemodemanager");
+  managerlocation = pathlib.join(__dirname,"gamemodes",self.config.plugin,"gamemodemanager");
   child = exec(managerlocation + ' getlist',
   function (error, stdout, stderr) {
     res.send(JSON.parse(stdout));
@@ -217,29 +218,29 @@ GameServer.prototype.getgamemodes = function getgamemode(res){
 }
 
 GameServer.prototype.installgamemode = function installgamemode(){
-  managerlocation = pathlib.join(__dirname,"gamemodes",this.config.plugin,"gamemodemanager");
-  if (this.status == ON){
-    this.turnoff();
+  managerlocation = pathlib.join(__dirname,"gamemodes",self.config.plugin,"gamemodemanager");
+  if (self.status == ON){
+    self.turnoff();
     console.log("HERE");
   }
-  this.setStatus(CHANGING_GAMEMODE);
-  console.log(this.config.path)
-  installer = spawn(managerlocation, ["install", "craftbukkit", this.config.path], {cwd: this.config.path});
+  self.setStatus(CHANGING_GAMEMODE);
+  console.log(self.config.path)
+  installer = spawn(managerlocation, ["install", "craftbukkit", self.config.path], {cwd: self.config.path});
   
   console.log(managerlocation);
   
   installer.stdout.on('data', function(data){
     if (data == "\r\n"){return}
     console.log(data);
-    this.emit('console',data);
+    self.emit('console',data);
   });
       
   installer.on('exit', function(){
-    this.setStatus(OFF);
+    self.setStatus(OFF);
   });
 }
 
 GameServer.prototype.removegamemode = function Console(){
-  this.ps = spawn(this.exe, [this.config.path], {cwd: this.config.path});
+  self.ps = spawn(self.exe, [self.config.path], {cwd: self.config.path});
 }
 module.exports = GameServer;
