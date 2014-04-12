@@ -25,11 +25,7 @@ function GameServer(config) {
   this.joined = ["-Xmx", "-XX:PermSize="];
   this.plugin = plugins[this.config.plugin + '.js'];
   this.variables = merge(this.joined, this.plugin.defaultvariables, this.config.variables);
-  this.exe = this.plugin.exe;
-  
-  console.log(this.variables);
-  console.log("done");
-  
+  this.exe = this.plugin.exe; 
 };
 
 util.inherits(GameServer, events.EventEmitter);
