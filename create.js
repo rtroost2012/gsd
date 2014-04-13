@@ -102,7 +102,7 @@ function copyFolder(gameserver, from_path, parentcallback){
   });
 }
 
-
+exports.copyFolder = copyFolder;
 exports.symlinkFolder = symlinkFolder;
 exports.createUser = createUser;
 exports.deleteUser = deleteUser;
