@@ -2,14 +2,14 @@ mcping = require('mcquery');
 fs = require('fs');
 pathlib = require('path');
 glob = require('glob')
-symlinkFolder = require('../create.js').symlinkFolder;
+copyFolder = require('../create.js').copyFolder;
 var async = require('async');
 
 var settings = {};
 settings.name = "Minecraft"
 settings.stop_command = 'stop'
 settings.started_trigger = ')! For help, type "help" or "?"'
-settings.defaultvariables = {"-Xmx":"512M", "-jar":"minecraft_server.jar", "-Djline.terminal=":"jline.UnsupportedTerminal"}
+settings.defaultvariables = {"-Djline.terminal=":"jline.UnsupportedTerminal", "-Xmx":"512M", "-jar":"minecraft_server.jar"}
 settings.exe = "java",
 settings.defaultPort = 25565;
 
