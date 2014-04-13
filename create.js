@@ -80,7 +80,7 @@ function replaceFiles(base_folder, files, backing_folder, callback){
   callback();
 }
 
-function easy_install(gameserver, from_path, replacements, parentcallback){
+function symlinkFolder(gameserver, from_path, replacements, parentcallback){
   async.series([
     function(callback) {
       linkDir(from_path, gameserver.config.path, function(){callback(null)});
@@ -93,9 +93,17 @@ function easy_install(gameserver, from_path, replacements, parentcallback){
   ], function(err, results){parentcallback();});
 }
 
+function copyFolder(gameserver, from_path, parentcallback){
+  ncp(from_path, gameserver.config.path, function (err) {
+    if (err) {
+    return console.error(err);
+    }
+    parentcallback();
+  });
+}
 
-exports.fixperms = fixperms;
-exports.easy_install = easy_install;
+
+exports.symlinkFolder = symlinkFolder;
 exports.createUser = createUser;
 exports.deleteUser = deleteUser;
 exports.linkDir = linkDir;

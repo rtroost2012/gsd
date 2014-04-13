@@ -1,8 +1,8 @@
-
 srcdsquery = require('gamedig');
 fs = require('fs');
 pathlib = require('path');
 glob = require('glob')
+symlinkFolder = require('../create.js').symlinkFolder;
 
 var settings = {};
 settings.name = "Team Fortress 2"
@@ -10,13 +10,14 @@ settings.stop_command = 'stop'
 settings.started_trigger = 'Connection to Steam servers successful'
 settings.defaultvariables = {"+map":"ctf_2fort", "-game":"tf"}
 settings.exe = "./srcds_wrap",
+settings.defaultPort = 27015;
 
 settings.query = function query(self){
   Gamedig.query(
     {
         type: 'tf2',
-        host: self.config.gamehost,
-	port: self.config.gameport
+        host: self.gamehost,
+	port: self.gameport
     },
     function(res) {
         if(res.error){
@@ -35,7 +36,7 @@ settings.query = function query(self){
 };
 
 settings.install = function(server, callback){
-  easy_install(server, "/mnt/TF2/", ["tf/cfg/*.cfg","tf/cfg/mapcycle*", "tf/cfg/motd*","tf/cfg/replay*"], callback);
+  symlinkFolder(server, "/mnt/TF2/", ["tf/cfg/*.cfg","tf/cfg/mapcycle*", "tf/cfg/motd*","tf/cfg/replay*"], callback);
 }
 
 settings.maplist = function maplist(self){

@@ -2,18 +2,19 @@ mcping = require('mcquery');
 fs = require('fs');
 pathlib = require('path');
 glob = require('glob')
-easy_install = require('../create.js').easy_install;
+symlinkFolder = require('../create.js').symlinkFolder;
 var async = require('async');
 
 var settings = {};
 settings.name = "Minecraft"
 settings.stop_command = 'stop'
 settings.started_trigger = ')! For help, type "help" or "?"'
-settings.defaultvariables = {"-Xmx":"512M", "-jar":"minecraft_server.jar"}
+settings.defaultvariables = {"-Xmx":"512M", "-jar":"minecraft_server.jar", "-Djline.terminal=":"jline.UnsupportedTerminal"}
 settings.exe = "java",
+settings.defaultPort = 25565;
 
 settings.query = function query(self){
-  var query = new mcping(self.config.gamehost, self.config.gameport);
+  var query = new mcping(self.gamehost, self.gameport);
   var reqcount=2;
   
   query.connect( function(err){
@@ -37,8 +38,7 @@ settings.query = function query(self){
 };
 
 settings.install = function(server, callback){
-
-  easy_install(server, "/mnt/MC/", [], function(){callback()});
+  copyFolder(server, "/mnt/MC/", function(){callback()});
 }
 
 settings.maplist = function maplist(self){
