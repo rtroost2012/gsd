@@ -25,7 +25,8 @@
     "mcquery":"",
     "usage":"",
     "pty.js":"",
-    "async":""
+    "async":"",
+    "ncp":""
   },
   "engines": {
     "node": ">=0.6"
