@@ -27,13 +27,13 @@ function GameServer(config) {
   this.variables = merge(this.joined, this.plugin.defaultvariables, this.config.variables);
   this.exe = this.plugin.exe;
   
-  if ('gameport' in this.config || this.config.gameport != 0){
+  if ('gameport' in this.config && this.config.gameport != 0){
     this.gameport = this.config.gameport
   }else{
     this.gameport = this.plugin.settings.defaultPort;
   }
 
-  if ('gamehost' in this.config || this.config.gamehost != ""){
+  if ('gamehost' in this.config && this.config.gamehost != ""){
     this.gamehost = this.config.gamehost
   }else{
     this.gamehost = getIPAddress();
