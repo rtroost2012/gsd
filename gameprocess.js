@@ -12,6 +12,7 @@ var exec = require('child_process').exec;
 var createUser = require("./create.js").createUser;
 var deleteUser = require("./create.js").deleteUser;
 var fixperms = require("./create.js").fixperms;
+var getIPAddress = require("./utls.js").getIPAddress;
 
 var async = require('async');
 
@@ -21,10 +22,23 @@ var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3; CHANGING_GAMEMODE = 4;
 function GameServer(config) {
   this.status = OFF;
   this.config = config;
-  this.joined = ["-Xmx", "-XX:PermSize="];
+  this.joined = ["-Xmx", "-XX:PermSize=", "-Djline.terminal="];
   this.plugin = plugins[this.config.plugin + '.js'];
   this.variables = merge(this.joined, this.plugin.defaultvariables, this.config.variables);
-  this.exe = this.plugin.exe; 
+  this.exe = this.plugin.exe;
+  
+  if ('gameport' in this.config || this.config.gameport != 0){
+    this.gameport = this.config.gameport
+  }else{
+    this.gameport = this.plugin.settings.defaultPort;
+  }
+
+  if ('gamehost' in this.config || this.config.gamehost != ""){
+    this.gamehost = this.config.gamehost
+  }else{
+    this.gamehost = getIPAddress();
+  }
+  
 };
 
 util.inherits(GameServer, events.EventEmitter);
@@ -48,7 +62,6 @@ GameServer.prototype.turnon = function(){
 
     this.ps.on('data', function(data){
       output = data.toString();
-      console.log("from proc" + output);
       self.emit("console", output);
       if (self.status == STARTING){
 	if (output.indexOf(self.plugin.started_trigger) !=-1){
