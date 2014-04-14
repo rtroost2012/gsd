@@ -20,20 +20,20 @@ function initServer(index){
     servers[index].console = io.of('/'+index);
  
     servers[index].on('console', function(data){
-	servers[index].console.sockets.emit('console', {'l':data.toString()});
+	servers[index].console.emit('console', {'l':data.toString()});
     });
     
     servers[index].on('statuschange', function(data) {
-	servers[index].console.sockets.emit('statuschange', {'status':servers[index].status});
+	servers[index].console.emit('statuschange', {'status':servers[index].status});
     });
     
     servers[index].on('query', function(data) {
-	servers[index].console.sockets.emit('query', {"query":servers[index].lastquery});
+	servers[index].console.emit('query', {"query":servers[index].lastquery()});
     });
     
 
     servers[index].on('processStats', function(data) {
-	servers[index].console.sockets.emit('process', {"process":servers[index].usagestats});
+	servers[index].console.emit('process', {"process":servers[index].usagestats});
     });
     
     servers[index].console.on('sendconsole', function (command) {
@@ -145,3 +145,4 @@ restserver.del('/gameservers/:id/gamemodes', function command(req, res, next){se
 restserver.listen(config.daemon.listenport, function() {
   console.log('%s listening at %s', restserver.name, restserver.url);
 });
+
