@@ -8,16 +8,16 @@ var fs = require('fs');
 var servers = [];
 var plugins = require('./plugins').plugins;
 
+var io = require('socket.io').listen(config.daemon.consoleport);
+
 Object.keys(config.servers).forEach(function(item, index) {
     initServer(index);
 });
 
-
-
 function initServer(index){
     data = config.servers[index];
     servers[index] = new gameserver(data);
-    servers[index].console = require('socket.io').listen(data.consoleport);
+    servers[index].console = io.of('/'+index);
  
     servers[index].on('console', function(data){
 	servers[index].console.sockets.emit('console', {'l':data.toString()});
@@ -61,7 +61,7 @@ restserver.get('/', function info(req, res, next){
     settings = plugins[key];
     _plugins[settings.name] = {"file":key.slice(0, -3)};
   }
-  response = {'plugins':_plugins};
+  response = {'plugins':_plugins, 'settings':{'consoleport':config.daemon.consoleport}};
   res.send(response);
 });
 
