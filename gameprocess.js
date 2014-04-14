@@ -30,7 +30,7 @@ function GameServer(config) {
   if ('gameport' in this.config && this.config.gameport != 0){
     this.gameport = this.config.gameport
   }else{
-    this.gameport = this.plugin.settings.defaultPort;
+    this.gameport = this.plugin.defaultPort;
   }
 
   if ('gamehost' in this.config && this.config.gamehost != ""){
