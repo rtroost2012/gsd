@@ -20,31 +20,20 @@ function initServer(index){
     servers[index].console = require('socket.io').listen(data.consoleport);
  
     servers[index].on('console', function(data){
-	if (servers[index].console.sockets.length > 0){
-	  servers[index].console.sockets.emit('console', {'l':data.toString()});
-	}
+	servers[index].console.sockets.emit('console', {'l':data.toString()});
     });
     
     servers[index].on('statuschange', function(data) {
-	if (servers[index].console.sockets.length > 0){
-	  servers[index].console.sockets.emit('statuschange', {'status':servers[index].status});
-	}
+	servers[index].console.sockets.emit('statuschange', {'status':servers[index].status});
     });
     
-    var lastquery;
     servers[index].on('query', function(data) {
-	if (lastquery != servers[index].lastquery){      
-	  servers[index].console.sockets.emit('query', {"query":servers[index].lastquery});
-	  lastquery = servers[index].lastquery;
-	}
+	servers[index].console.sockets.emit('query', {"query":servers[index].lastquery});
     });
     
-    var lastprocessStats;
+
     servers[index].on('processStats', function(data) {
-	if (lastprocessStats != servers[index].usagestats){
-	  servers[index].console.sockets.emit('processStats', servers[index].usagestats);
-	  lastprocessStats = servers[index].usagestats;
-	}
+	servers[index].console.sockets.emit('process', {"process":servers[index].usagestats});
     });
     
     servers[index].console.on('sendconsole', function (command) {
