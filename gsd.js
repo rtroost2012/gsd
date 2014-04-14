@@ -20,13 +20,13 @@ function initServer(index){
     servers[index].console = require('socket.io').listen(data.consoleport);
  
     servers[index].on('console', function(data){
-	if (servers[index].console.of('/console').sockets.length > 0){
+	if (servers[index].console.sockets.length > 0){
 	  servers[index].console.sockets.emit('console', {'l':data.toString()});
 	}
     });
     
     servers[index].on('statuschange', function(data) {
-	if (servers[index].console.of('/status').sockets.length > 0){
+	if (servers[index].console.sockets.length > 0){
 	  servers[index].console.sockets.emit('statuschange', {'status':servers[index].status});
 	}
     });
