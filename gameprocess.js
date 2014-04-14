@@ -67,7 +67,7 @@ GameServer.prototype.turnon = function(){
 	if (output.indexOf(self.plugin.started_trigger) !=-1){
 	  self.setStatus(ON);
 	  console.log("Server started");
-	  self.queryCheck = setInterval(self.plugin.query, 15000, self);
+	  self.queryCheck = setInterval(self.query, 15000, self);
 	  self.statCheck = setInterval(self.procStats, 10000, self);
 	  self.usagestats = {};
 	  self.emit('started');
@@ -145,18 +145,18 @@ GameServer.prototype.setStatus = function(status){
 }
 
 
-GameServer.prototype.query = function(){
-  return this.plugin.query()
+GameServer.prototype.query = function(self){
+  r = self.plugin.query(self);
+  self.emit('query');
+  return r;
 }
 
 GameServer.prototype.procStats = function(self){
   usage.lookup(self.pid, {keepHistory: true}, function(err, result) {
     // TODO : Return as % of os.totalmem() (optional)
     // TODO : Return as % of ram max setting
-
-    self.usagestats = result;
-    console.log(result);
-    console.log(self.usagestats);
+    self.usagestats = {"memory":result.memory, "cpu":Math.round(result.cpu)};
+    self.emit('processStats');
   });
 }
 
