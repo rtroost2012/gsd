@@ -1,0 +1,23 @@
+{
+    "daemon": {
+        "listenport": 8003,
+        "consoleport": 8031
+    },
+    "tokens": [
+        "123"
+    ],
+    "servers": [
+        {
+            "name": "test server",
+            "user": "testuser",
+            "overide_command_line": "",
+            "path": "./test/",
+            "variables": {
+	      "Xmx":"512M"
+            },
+            "gameport": 25565,
+            "gamehost": "",
+            "plugin": "minecraft"
+        }
+    ]
+}
