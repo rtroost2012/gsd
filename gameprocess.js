@@ -200,17 +200,17 @@ GameServer.prototype.console = function Console(){
 
 
 GameServer.prototype.readfile = function readfile(f){
-  file = pathlib.join(self.config.path, pathlib.normalize(f));
+  file = pathlib.join(this.config.path, pathlib.normalize(f));
   return fs.readFileSync(file, "utf8");
 }
 
 GameServer.prototype.writefile = function writefile(f, contents){
-  file = pathlib.join(self.config.path, pathlib.normalize(f));
+  file = pathlib.join(this.config.path, pathlib.normalize(f));
   fs.writeFile(file, contents);
 }
 
 GameServer.prototype.downloadfile = function downloadfile(url, path){
-    path = pathlib.join(self.config.path, pathlib.normalize(path));
+    path = pathlib.join(this.config.path, pathlib.normalize(path));
    
     //TODO : Work out when to extract (zip etc...) , { extract: true }
     download(url, path);
