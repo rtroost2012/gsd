@@ -11,7 +11,8 @@ function authenticate(req, res, next) {
     
     if (!('X-Access-Token' in req.headers)){
       console.log('not authenticated, missing header');
-      return next(restify.NotAuthorizedError());
+      res.writeHead(403);
+      res.end('Sorry you are not authorized');
     }
        
     token = req.headers['X-Access-Token']
@@ -19,8 +20,9 @@ function authenticate(req, res, next) {
     if (config.tokens.indexOf(token) > -1){
       return next();
     }else{
-      console.log('not authenticated, wrong auth');      
-      return next(restify.NotAuthorizedError());
+      console.log('not authenticated, wrong auth');
+      res.writeHead(403);
+      res.end('Sorry you are not authorized');      
     }
 }
 
