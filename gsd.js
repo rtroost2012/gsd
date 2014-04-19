@@ -127,7 +127,7 @@ restserver.get('/gameservers/:id/configlist', function configlist(req, res, next
 restserver.get('/gameservers/:id/maplist', function maplist(req, res, next){service = servers[req.params.id]; res.send(service.maplist());});
 restserver.get('/gameservers/:id/query', function query(req, res, next){service = servers[req.params.id]; res.send(service.lastquery());});
 
-restserver.post('/gameservers/:id/console', function command(req, res, next){service = servers[req.params.id];  res.send(service.send(req.params.command);)});
+restserver.post('/gameservers/:id/console', function command(req, res, next){service = servers[req.params.id];  res.send(service.send(req.params.command))});
 
 restserver.get('/gameservers/:id/addonsinstalled', function command(req, res, next){service = servers[req.params.id]; res.send(service.addonlist());});
 
