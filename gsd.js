@@ -37,7 +37,11 @@ function initServer(index){
     });
     
     servers[index].console.on('sendconsole', function (command) {
-	console.log(command);
+    	if(servers[index].status == ON){
+		console.log(command);
+    	}else{
+    		console.log("Server is off. You cannot send command!");
+    	}
     });
 }
 
@@ -122,7 +126,7 @@ restserver.get('/gameservers/:id/configlist', function configlist(req, res, next
 restserver.get('/gameservers/:id/maplist', function maplist(req, res, next){service = servers[req.params.id]; res.send(service.maplist());});
 restserver.get('/gameservers/:id/query', function query(req, res, next){service = servers[req.params.id]; res.send(service.lastquery());});
 
-restserver.post('/gameservers/:id/console', function command(req, res, next){service = servers[req.params.id]; service.send(req.params.command); res.send('ok');});
+restserver.post('/gameservers/:id/console', function command(req, res, next){service = servers[req.params.id]; if(service.status == ON){service.send(req.params.command); res.send('ok');}else{res.send('server_off');}});
 
 restserver.get('/gameservers/:id/addonsinstalled', function command(req, res, next){service = servers[req.params.id]; res.send(service.addonlist());});
 
