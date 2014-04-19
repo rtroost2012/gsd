@@ -131,7 +131,7 @@ restserver.post('/gameservers/:id/console', function command(req, res, next){ser
 
 restserver.get('/gameservers/:id/addonsinstalled', function command(req, res, next){service = servers[req.params.id]; res.send(service.addonlist());});
 
-restserver.get(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {service = servers[req.params[0]];res.send({'contents':service.readfile(req.params[1])})});
+restserver.get(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {service = servers[req.params[0]];res.send({'contents':service.readfile(req.params[1])});});
 restserver.put(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {
   if ('contents' in req.params){
     service = servers[req.params[0]];res.send(service.writefile(req.params[1], req.params['contents']));
