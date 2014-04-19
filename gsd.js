@@ -37,7 +37,11 @@ function initServer(index){
     });
     
     servers[index].console.on('sendconsole', function (command) {
-	console.log(command);
+    	if(servers[index].status == ON){
+		console.log(command);
+    	}else{
+    		console.log("Server is off. You cannot send command!");
+    	}
     });
 }
 
