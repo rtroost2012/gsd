@@ -190,8 +190,12 @@ GameServer.prototype.kill = function(){
 }
 
 GameServer.prototype.send = function(data){
-  console.log(data);
-  this.ps.write(data + '\n');
+  if (self.status == ON or self.status == STARTING){
+    this.ps.write(data + '\n');
+    return true;
+  }else{
+    return false;
+  }
 }
 
 GameServer.prototype.console = function Console(){
