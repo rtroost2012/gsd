@@ -36,9 +36,17 @@ settings.query = function query(self){
 })
   
 };
+settings.commands = {
+  'player':{
+    'kick':'kick {{player}}',
+    'ban':'ban {{player}}',
+    'kill':'kill {{player}}',
+    'clearinventory':'clearinventory {{player}}'
+  }
+}
 
 settings.install = function(server, callback){
-  copyFolder(server, "/mnt/MC/", function(){callback()});
+  copyFolder(server, "/mnt/MC/CraftBukkit", function(){callback()});
 }
 
 settings.maplist = function maplist(self){

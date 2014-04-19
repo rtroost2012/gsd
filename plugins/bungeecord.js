@@ -2,6 +2,7 @@ mc = require('./minecraft');
 fs = require('fs');
 pathlib = require('path');
 glob = require("glob")
+copyFolder = require('../create.js').copyFolder;
 
 var settings = {};
 settings.name = "Bungeecord"
@@ -12,6 +13,9 @@ settings.exe = "java",
 
 settings.query = mc.query;
 
+settings.install = function(server, callback){
+  copyFolder(server, "/mnt/MC/BungeeCord", function(){callback()});
+}
 
 settings.maplist = function maplist(self){
     maps = [];
