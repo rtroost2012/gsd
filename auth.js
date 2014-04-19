@@ -4,7 +4,11 @@ var restify = require('restify');
 // This is very very simple auth to be replaced later with something like username / password http auth, oauth or jwt, feel free to do so !
 
 function authenticate(req, res, next) {
-    //
+    // Don't run auth on options requests, this messes with angularjs
+    if (req.method.toLowerCase() === 'options') {
+      return next();
+    }
+    
     if (!('X-Access-Token' in req.headers) && 'x-access-token' in req.headers){
       req.headers['X-Access-Token'] = req.headers['x-access-token']
     }
@@ -13,6 +17,7 @@ function authenticate(req, res, next) {
       console.log('not authenticated, missing header');
       res.writeHead(403);
       res.end('Sorry you are not authorized');
+      return next();
     }
        
     token = req.headers['X-Access-Token']
@@ -24,6 +29,9 @@ function authenticate(req, res, next) {
       res.writeHead(403);
       res.end('Sorry you are not authorized');      
     }
+
+    return next();
+      
 }
 
 exports.authenticate = authenticate;
