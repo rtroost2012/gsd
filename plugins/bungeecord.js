@@ -13,6 +13,11 @@ settings.exe = "java",
 
 settings.query = mc.query;
 
+settings.preflight = function(server, callback){
+  
+  callback();
+}
+
 settings.install = function(server, callback){
   copyFolder(server, "/mnt/MC/BungeeCord", function(){callback()});
 }

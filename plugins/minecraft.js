@@ -45,8 +45,13 @@ settings.commands = {
   }
 }
 
+settings.preflight = function(server, callback){
+  
+  callback();
+}
+
 settings.install = function(server, callback){
-  copyFolder(server, "/mnt/MC/CraftBukkit", function(){callback()});
+  copyFolder(server, "/mnt/MC/CraftBukkit/", function(){callback()});
 }
 
 settings.maplist = function maplist(self){
