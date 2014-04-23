@@ -45,9 +45,19 @@ settings.commands = {
   }
 }
 
-settings.preflight = function(server, callback){
-  
-  callback();
+settings.preflight = function(server){
+  console.log(server.config.variables);
+  if ('-jar' in server.config.variables){
+    var jar = server.config.variables['-jar']
+  }else{
+    var jar = server.plugin.defaultvariables['-jar']
+  }
+
+  if (!fs.existsSync(pathlib.join(server.config.path, jar))){
+    var err = new Error('Jar doesn\'t exist');
+    throw err;
+  }
+
 }
 
 settings.install = function(server, callback){

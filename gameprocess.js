@@ -53,6 +53,7 @@ GameServer.prototype.turnon = function(){
       return;
     }
     
+    this.plugin.preflight(this);
     this.ps = pty.spawn(this.exe, this.variables, {cwd: this.config.path});
 
     this.setStatus(STARTING);
