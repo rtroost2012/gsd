@@ -192,9 +192,9 @@ GameServer.prototype.kill = function(){
 GameServer.prototype.send = function(data){
   if (this.status == ON || this.status == STARTING){
     this.ps.write(data + '\n');
-    return true;
   }else{
-    return false;
+    var err = new Error('Server turned off');
+    throw err;
   }
 }
 
