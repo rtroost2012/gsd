@@ -4,7 +4,7 @@ var pathlib = require('path');
 var fs = require('fs');
 var ncp = require('ncp').ncp;
 var format = require('util').format;
-var executeCommand = require('./utls').executeCommand;
+var executeCommand = require('../utls').executeCommand;
 
 function createUser(username, home, callback){
   // TODO : check if user exists first
@@ -96,7 +96,7 @@ function symlinkFolder(gameserver, from_path, replacements, parentcallback){
 function copyFolder(gameserver, from_path, parentcallback){
   ncp(from_path, gameserver.config.path, function (err) {
     if (err) {
-    return console.error(err);
+      return console.error(err);
     }
     parentcallback();
   });

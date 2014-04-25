@@ -2,8 +2,8 @@ var spawn = require('child_process').spawn;
 var pty = require('pty.js');
 var util = require("util");
 var events = require("events");
+var merge = require("../utls.js").merge;
 var plugins = require("./plugins.js").plugins;
-var merge = require("./utls.js").merge;
 var download = require('download');
 var usage = require('usage');
 var pathlib = require('path');
@@ -12,7 +12,7 @@ var exec = require('child_process').exec;
 var createUser = require("./create.js").createUser;
 var deleteUser = require("./create.js").deleteUser;
 var fixperms = require("./create.js").fixperms;
-var getIPAddress = require("./utls.js").getIPAddress;
+var getIPAddress = require("../utls.js").getIPAddress;
 
 var async = require('async');
 
@@ -42,7 +42,6 @@ function GameServer(config) {
 };
 
 util.inherits(GameServer, events.EventEmitter);
-
 
 GameServer.prototype.turnon = function(){
     var self = this;
