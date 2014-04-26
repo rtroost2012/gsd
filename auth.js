@@ -1,9 +1,12 @@
 var config = require('./config.json');
-var restify = require('restify');
+var restify = require('restify');       
+var keys = require('./keys.json');
 
 // This is very very simple auth to be replaced later with something like username / password http auth, oauth or jwt, feel free to do so !
 
 function authenticate(req, res, next) {
+    next();
+    
     // Don't run auth on options requests, this messes with angularjs
     if (req.method.toLowerCase() === 'options') {
       return next();
@@ -34,4 +37,22 @@ function authenticate(req, res, next) {
       
 }
 
+function hasPermission(permission, key, service){
+  if (config.tokens.indexOf(permission) > -1){
+    return true;
+  }
+  
+  service = Number(service);
+  if (key in keys){
+    if (keys[key].services.indexOf(service) >= 0 || service == -1){
+      if (keys[key].permissions.indexOf(permission) >= 0){
+	  console.log("B");
+	return true;
+      }
+    }
+  }
+  return false;
+}
+
+exports.hasPermission = hasPermission;
 exports.authenticate = authenticate;

@@ -1,0 +1,6 @@
+{
+    "key123456": {
+        "services": [0,1,2,3],
+        "permissions":["services:new","services:list","service:get","service:update","service:delete","service:power","service:files","service:query","service:console","service:addons"]
+     }
+}
