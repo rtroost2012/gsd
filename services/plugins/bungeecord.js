@@ -11,7 +11,28 @@ settings.started_trigger = '[INFO] Listening on'
 settings.defaultvariables = {"-Xmx":"256M", "-jar":"BungeeCord.jar"}
 settings.exe = "java",
 
-settings.query = mc.query;
+settings.query = function query(self){
+  Gamedig.query(
+    {
+        type: 'minecraft',
+        host: self.gamehost,
+	port: self.gameport
+    },
+    function(res) {
+        if(res.error){
+	  self.emit('crash');
+	}else{
+	  self.hostname = res['name'];	
+	  self.numplayers = res['players'].length;
+	  self.maxplayers = res['maxplayers'];
+	  self.map        = res['map'];
+	  self.players    = res['players'];
+	  self.lastquerytime = new Date().getTime();
+	}
+    }
+);
+  
+};
 
 settings.preflight = function(server, callback){
   
