@@ -5,8 +5,6 @@ var keys = require('./keys.json');
 // This is very very simple auth to be replaced later with something like username / password http auth, oauth or jwt, feel free to do so !
 
 function authenticate(req, res, next) {
-    next();
-    
     // Don't run auth on options requests, this messes with angularjs
     if (req.method.toLowerCase() === 'options') {
       return next();
@@ -38,7 +36,7 @@ function authenticate(req, res, next) {
 }
 
 function hasPermission(permission, key, service){
-  if (config.tokens.indexOf(permission) > -1){
+  if (config.tokens.indexOf(key) > -1){
     return true;
   }
   
