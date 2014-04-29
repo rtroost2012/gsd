@@ -14,26 +14,25 @@ settings.exe = "java",
 settings.defaultPort = 25565;
 
 settings.query = function query(self){
-  var query = new mcping(self.gamehost, self.gameport);
-  var reqcount=2;
-  
-  query.connect( function(err){
-    if(err){
-      console.error("Couldn't query server, please check the IP / port are configured correctly and query is enabled");
-      self.emit('crash');
+  Gamedig.query(
+    {
+        type: 'minecraft',
+        host: self.gamehost,
+	port: self.gameport
+    },
+    function(res) {
+        if(res.error){
+	  self.emit('crash');
+	}else{
+	  self.hostname = res['name'];	
+	  self.numplayers = res['players'].length;
+	  self.maxplayers = res['maxplayers'];
+	  self.map        = res['map'];
+	  self.players    = res['players'];
+	  self.lastquerytime = new Date().getTime();
+	}
     }
-  else{
-    query.full_stat(function(err, res){
-        self.hostname = res['hostname'];	
-        self.numplayers = res['numplayers'];
-        self.maxplayers = res['maxplayers'];
-	self.map        = res['map'];
-	self.players    = res['player_'];
-	self.lastquerytime = new Date().getTime();
-      
-    });
-  }
-})
+);
   
 };
 settings.commands = {
