@@ -4,6 +4,7 @@ pathlib = require('path');
 glob = require('glob')
 copyFolder = require('../create.js').copyFolder;
 var async = require('async');
+var Gamedig = require('gamedig');
 
 var settings = {};
 settings.name = "Minecraft"

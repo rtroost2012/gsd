@@ -1,4 +1,4 @@
-srcdsquery = require('gamedig');
+var Gamedig = require('gamedig');
 fs = require('fs');
 pathlib = require('path');
 glob = require('glob')
