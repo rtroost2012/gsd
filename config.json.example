@@ -6,6 +6,15 @@
     "tokens": [
         "123"
     ],
+    "interfaces":{
+      "rest":{},
+      "console":{},
+      "ftp":{
+	    "authurl":"http://www.mysite.com/ftpauth.php"
+	    "port":21,
+	    "host":"127.0.0.1"
+      }
+    },
     "servers": [
         {
             "name": "test server",
