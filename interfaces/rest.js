@@ -1,6 +1,5 @@
 var restify = require('restify');
 var unknownMethodHandler = require('../utls.js').unknownMethodHandler;
-var authenticate = require('../auth.js').authenticate;
 var hasPermission = require('../auth.js').hasPermission;
 
 var config = require('../config.json');
@@ -12,7 +11,6 @@ var restserver = restify.createServer();
 restserver.use(restify.bodyParser());
 restserver.use(restify.authorizationParser());
 restserver.on('MethodNotAllowed', unknownMethodHandler);
-//restserver.use(authenticate);
 
 restserver.use(
   function crossOrigin(req,res,next){
