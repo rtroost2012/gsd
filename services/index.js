@@ -12,4 +12,5 @@ function initServer(index){
     servers[index].initconsole(index);
 }
 
+exports.initServer = initServer;
 exports.servers = servers;

@@ -6,8 +6,9 @@ var config = require('../config.json');
 var plugins = require("../services/plugins.js").plugins;
 var saveconfig = require('../utls.js').saveconfig;
 var servers = require('../services/index.js').servers;
-
+var initServer = require('../services/index.js').initServer;
 var restserver = restify.createServer();
+
 restserver.use(restify.bodyParser());
 restserver.use(restify.authorizationParser());
 restserver.on('MethodNotAllowed', unknownMethodHandler);
