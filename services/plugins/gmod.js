@@ -37,12 +37,10 @@ settings.query = function query(self){
 
 settings.preflight = function(server){
 
-  
-  callback();
 }
 
 settings.install = function(server, callback){
-  symlinkFolder(server, "/mnt/gmod/", ["garrysmod/cfg/*.cfg","garrysmod/cfg/mapcycle*", "garrysmod/cfg/motd*"], callback);
+  symlinkFolder(server, "/mnt/gmod/", ["garrysmod/cfg/*.cfg","garrysmod/cfg/mapcycle*", "garrysmod/maps/*.nav", "garrysmod/cfg/motd*"], callback);
 }
 
 settings.maplist = function maplist(self){
