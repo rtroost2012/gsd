@@ -35,7 +35,7 @@ settings.query = function query(self){
 );
 };
 
-settings.preflight = function(server, callback){
+settings.preflight = function(server){
 
   
   callback();

@@ -35,14 +35,14 @@ settings.query = function query(self){
   
 };
 
-settings.preflight = function(server, callback){
+settings.preflight = function(server){
 
   
   callback();
 }
 
 settings.install = function(server, callback){
-  symlinkFolder(server, "/mnt/TF2/", ["tf/cfg/*.cfg","tf/cfg/mapcycle*", "tf/cfg/motd*","tf/cfg/replay*"], callback);
+  symlinkFolder(server, "/mnt/tf2/", ["tf/cfg/*.cfg","tf/cfg/mapcycle*", "tf/cfg/motd*","tf/cfg/replay*"], callback);
 }
 
 settings.maplist = function maplist(self){
