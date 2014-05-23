@@ -7,7 +7,7 @@ import os
 action = sys.argv[1]
 
 if action == "getlist":
-  print '{"craftbukkit":["latest"]}'
+  print '{"craftbukkit":["Latest"], "Feed The beast":["Monster"]}'
   sys.exit(0)
   
 gamemode = sys.argv[2]

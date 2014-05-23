@@ -44,6 +44,10 @@ function GameServer(config) {
 
 util.inherits(GameServer, events.EventEmitter);
 
+GameServer.prototype.updatevariables = function(variables){
+    this.variables = merge(this.plugin.joined, this.variables, variables);
+}
+
 GameServer.prototype.turnon = function(){
     var self = this;
     
