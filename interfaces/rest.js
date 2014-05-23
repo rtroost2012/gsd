@@ -98,7 +98,7 @@ restserver.put('/gameservers/:id', function info(req, res, next){
   if (!restauth(req, req.params.id, "service:update")){res = unauthorized(res); return next();}
   service = servers[req.params.id];
   config.servers[req.params.id].variables = req.params['variables'];
-  servers[req.params].variables = req.params['variables'];
+  servers[req.params].updatevariables(req.params['variables']);
   saveconfig(config);
   
   res.send(service.info());
