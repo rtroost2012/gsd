@@ -65,30 +65,30 @@ GameServer.prototype.turnon = function(){
       output = data.toString();
       self.emit("console", output);
       if (self.status == STARTING){
-	if (output.indexOf(self.plugin.started_trigger) !=-1){
-	  self.setStatus(ON);
-	  console.log("Server started");
-	  self.queryCheck = setInterval(self.query, 150, self);
-	  self.statCheck = setInterval(self.procStats, 100, self);
-	  self.usagestats = {};
-	  self.emit('started');
-	}
+        if (output.indexOf(self.plugin.started_trigger) !=-1){
+          self.setStatus(ON);
+          console.log("Server started");
+          self.queryCheck = setInterval(self.query, 150, self);
+          self.statCheck = setInterval(self.procStats, 100, self);
+          self.usagestats = {};
+          self.emit('started');
+        }
       };
     });
       
     this.ps.on('exit', function(){
       if (self.status == STOPPING){
-	console.log("Process stopped");
-	self.setStatus(OFF);
-	self.emit('off');
-	return;	
+        console.log("Process stopped");
+        self.setStatus(OFF);
+        self.emit('off');
+	    return;
       }
       
       if (self.status == ON || self.status == STARTING){
-	console.log("Process died a horrible death");
-	self.setStatus(OFF);
-	self.emit('off');
-	self.emit('crash');
+        console.log("Process died a horrible death");
+        self.setStatus(OFF);
+        self.emit('off');
+        self.emit('crash');
       }
     });
 
