@@ -12,6 +12,7 @@ settings.started_trigger = 'Connection to Steam servers successful'
 settings.defaultvariables = {"+map":"gm_construct", "-game":"garrysmod"}
 settings.exe = "./srcds_wrap",
 settings.defaultPort = 27015;
+settings.joined = [];
 
 settings.query = function query(self){
   Gamedig.query(

@@ -22,9 +22,10 @@ var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3; CHANGING_GAMEMODE = 4;
 function GameServer(config) {
   this.status = OFF;
   this.config = config;
-  this.joined = ["-Xmx", "-XX:PermSize=", "-Djline.terminal="];
   this.plugin = plugins[this.config.plugin + '.js'];
-  this.variables = merge(this.joined, this.plugin.defaultvariables, this.config.variables);
+  this.failcount = 0;
+
+  this.variables = merge(this.plugin.joined, this.plugin.defaultvariables, this.config.variables);
   this.exe = this.plugin.exe;
   
   if ('gameport' in this.config && this.config.gameport != 0){
@@ -67,8 +68,8 @@ GameServer.prototype.turnon = function(){
 	if (output.indexOf(self.plugin.started_trigger) !=-1){
 	  self.setStatus(ON);
 	  console.log("Server started");
-	  self.queryCheck = setInterval(self.query, 15000, self);
-	  self.statCheck = setInterval(self.procStats, 10000, self);
+	  self.queryCheck = setInterval(self.query, 150, self);
+	  self.statCheck = setInterval(self.procStats, 100, self);
 	  self.usagestats = {};
 	  self.emit('started');
 	}

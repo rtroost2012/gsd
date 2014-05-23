@@ -10,6 +10,7 @@ settings.stop_command = 'end'
 settings.started_trigger = '[INFO] Listening on'
 settings.defaultvariables = {"-Xmx":"256M", "-jar":"BungeeCord.jar"}
 settings.exe = "java",
+settings.joined = ["-Xmx", "-XX:PermSize=", "-Djline.terminal="];
 
 settings.query = mc.query;
 settings.preflight = mc.preflight;

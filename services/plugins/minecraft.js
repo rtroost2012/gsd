@@ -13,6 +13,7 @@ settings.started_trigger = ')! For help, type "help" or "?"'
 settings.defaultvariables = {"-Djline.terminal=":"jline.UnsupportedTerminal", "-Xmx":"512M", "-jar":"minecraft_server.jar"}
 settings.exe = "java",
 settings.defaultPort = 25565;
+settings.joined = ["-Xmx", "-XX:PermSize=", "-Djline.terminal="];
 
 settings.query = function query(self){
   Gamedig.query(

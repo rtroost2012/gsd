@@ -11,6 +11,7 @@ settings.started_trigger = 'Connection to Steam servers successful'
 settings.defaultvariables = {"+map":"ctf_2fort", "-game":"tf"}
 settings.exe = "./srcds_wrap",
 settings.defaultPort = 27015;
+settings.joined = [];
 
 settings.query = function query(self){
   Gamedig.query(
