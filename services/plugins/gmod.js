@@ -19,7 +19,7 @@ settings.query = function query(self){
     {
         type: 'garrysmod',
         host: self.gamehost,
-	port: self.gameport
+	    port: self.gameport
     },
     function(res) {
         if(res.error){
@@ -41,7 +41,8 @@ settings.preflight = function(server){
 }
 
 settings.install = function(server, callback){
-  symlinkFolder(server, "/mnt/gmod/", ["garrysmod/cfg/*.cfg","garrysmod/cfg/mapcycle*", "garrysmod/maps/*.nav", "garrysmod/cfg/motd*"], callback);
+    server.updatevariables({"-port":server.gameport});
+    symlinkFolder(server, "/mnt/gmod/", ["garrysmod/cfg/*.cfg","garrysmod/cfg/mapcycle*", "garrysmod/maps/*.nav", "garrysmod/cfg/motd*"], callback);
 }
 
 settings.maplist = function maplist(self){
