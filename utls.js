@@ -1,6 +1,7 @@
 var restify = require('restify');
 var exec = require('child_process').exec;
 
+
 function executeCommand(command, callback){
   exec(command,
     function (error, stdout, stderr) {
@@ -13,6 +14,18 @@ function executeCommand(command, callback){
   });  
 }
 
+function mergedicts(){
+    var sources = [].slice.call(arguments);
+    var variables = {};
+
+    sources.forEach(function (source) {
+        for (var key in source) {
+            variables[key] = source[key];
+        }
+    });
+
+    return variables;
+}
 function merge(joinedCliCommands) {
     var sources = [].slice.call(arguments, 1);
     var variables = [];
@@ -45,6 +58,13 @@ function saveconfig(config){
       console.log("JSON saved to " + outputFilename);
     }
   }); 
+}
+
+function savesettings(){
+    var servers = require('./services').servers;
+    var config = require('./config.json');
+    config.servers = servers.allsettings();
+    saveconfig(config);
 }
 
 function unknownMethodHandler(req, res) {
@@ -82,4 +102,6 @@ exports.getIPAddress = getIPAddress;
 exports.executeCommand = executeCommand;
 exports.saveconfig = saveconfig;
 exports.merge = merge;
+exports.mergedicts = mergedicts;
+exports.savesettings = savesettings;
 exports.unknownMethodHandler = unknownMethodHandler;

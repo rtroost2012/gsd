@@ -13,11 +13,11 @@ var createUser = require("./create.js").createUser;
 var deleteUser = require("./create.js").deleteUser;
 var fixperms = require("./create.js").fixperms;
 var getIPAddress = require("../utls.js").getIPAddress;
-
+var savesettings = require("../utls.js").savesettings;
 var async = require('async');
+var utls = require("../utls.js");
 
-
-var OFF = 0; ON = 1, STARTING = 2, STOPPING = 3; CHANGING_GAMEMODE = 4;
+var OFF = 0; ON = 1; STARTING = 2; STOPPING = 3; CHANGING_GAMEMODE = 4;
 
 function GameServer(config) {
   this.status = OFF;
@@ -25,7 +25,8 @@ function GameServer(config) {
   this.plugin = plugins[this.config.plugin + '.js'];
   this.failcount = 0;
 
-  this.variables = merge(this.plugin.joined, this.plugin.defaultvariables, this.config.variables);
+  this.variables = utls.mergedicts(this.plugin.defaultvariables, this.config.variables);
+  this.commandline = merge(this.plugin.joined, this.variables);
   this.exe = this.plugin.exe;
   
   if ('gameport' in this.config && this.config.gameport != 0){
@@ -39,14 +40,21 @@ function GameServer(config) {
   }else{
     this.gamehost = getIPAddress();
   }
-  
 };
 
 util.inherits(GameServer, events.EventEmitter);
 
-GameServer.prototype.updatevariables = function(variables){
-    this.variables = merge(this.plugin.joined, this.variables, variables);
+GameServer.prototype.updatevariables = function(variables, replace){
+    if (replace == true){
+        this.variables = utls.mergedicts(this.plugin.defaultvariables, variables);
+    }else{
+        this.variables = utls.mergedicts(this.plugin.defaultvariables, this.variables, variables);
+    }
+    this.config.variables = this.variables;
+    this.commandline = merge(this.plugin.joined, this.variables);
+    savesettings();
 }
+
 
 GameServer.prototype.turnon = function(){
     var self = this;
@@ -58,7 +66,7 @@ GameServer.prototype.turnon = function(){
     }
     
     this.plugin.preflight(this);
-    this.ps = pty.spawn(this.exe, this.variables, {cwd: this.config.path});
+    this.ps = pty.spawn(this.exe, this.commandline, {cwd: this.config.path});
 
     this.setStatus(STARTING);
     

@@ -12,5 +12,13 @@ function initServer(index){
     servers[index].initconsole(index);
 }
 
+servers.allsettings = function(){
+    output = [];
+    servers.forEach(function(item) {
+        output.push(item.config);
+    });
+    return output;
+}
+
 exports.initServer = initServer;
 exports.servers = servers;

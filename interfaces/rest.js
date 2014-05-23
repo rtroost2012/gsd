@@ -81,7 +81,6 @@ restserver.del('/gameservers/:id', function info(req, res, next){
   service = servers[req.params.id];
   // TODO: if on, turn off
   service.delete();    var ftpd = require('ftpd');
-
   id = config.servers.splice(req.params.id,1);
   saveconfig(config);
   res.send("ok");
@@ -97,8 +96,7 @@ restserver.get('/gameservers/:id', function (req, res, next){
 restserver.put('/gameservers/:id', function info(req, res, next){
   if (!restauth(req, req.params.id, "service:update")){res = unauthorized(res); return next();}
   service = servers[req.params.id];
-  config.servers[req.params.id].variables = req.params['variables'];
-  servers[req.params].updatevariables(req.params['variables']);
+  service.updatevariables(JSON.parse(req.params['variables']), true);
   saveconfig(config);
   
   res.send(service.info());

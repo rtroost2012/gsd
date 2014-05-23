@@ -41,7 +41,7 @@ settings.preflight = function(server){
 }
 
 settings.install = function(server, callback){
-    server.updatevariables({"-port":server.gameport});
+    server.updatevariables({"-port":server.gameport}, false);
     symlinkFolder(server, "/mnt/gmod/", ["garrysmod/cfg/*.cfg","garrysmod/cfg/mapcycle*", "garrysmod/maps/*.nav", "garrysmod/cfg/motd*"], callback);
 }
 

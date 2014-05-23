@@ -41,7 +41,7 @@ settings.preflight = function(server){
 }
 
 settings.install = function(server, callback){
-  server.updatevariables({"-port":server.gameport});
+    server.updatevariables({"-port":server.gameport}, false);
   symlinkFolder(server, "/mnt/tf2/", ["tf/cfg/*.cfg","tf/cfg/mapcycle*", "tf/cfg/motd*","tf/cfg/replay*"], callback);
 }
 
