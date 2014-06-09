@@ -19,8 +19,9 @@ settings.query = function query(self){
   Gamedig.query(
     {
         type: 'minecraft',
-        host: self.gamehost,
-	port: self.gameport
+        host: self.config.gamehost,
+        port: self.config.gameport,
+        port_query: self.config.gameport
     },
     function(res) {
         if(res.error){

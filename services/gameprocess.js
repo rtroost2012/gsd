@@ -141,7 +141,6 @@ GameServer.prototype.create = function(){
       self.plugin.install(self, function cb(){callback(null);});
     },
     function(callback) {
-      fixperms(self);
       callback(null); 
     }    
   ]);
