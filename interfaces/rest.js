@@ -205,7 +205,11 @@ restserver.get('/gameservers/:id/addonsinstalled', function command(req, res, ne
     res.send(service.addonlist());
 });
 
-restserver.get(/^\/gameservers\/(\d+)\/file\/(.+)/, function(req, res, next) {
+restserver.get('/gameservers/:id/file/:filename', function(req, res, next) {
+  if (!restauth(req, req.params.id, "service:file")) {
+  	res = unauthorized(res);
+    return next();
+  }
   service = servers[req.params[0]];
   res.send({'contents':service.readfile(req.params[1])});
 });
