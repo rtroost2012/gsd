@@ -210,8 +210,8 @@ restserver.get('/gameservers/:id/file/:filename', function(req, res, next) {
   	res = unauthorized(res);
     return next();
   }
-  service = servers[req.params[0]];
-  res.send({'contents':service.readfile(req.params[1])});
+  service = servers[req.params.id];
+  res.send({'contents':service.readfile(req.params.filename)});
 });
 
 restserver.put('/gameservers/:id/file/:filename', function(req, res, next) {
