@@ -80,8 +80,8 @@ GameServer.prototype.turnon = function(){
         if (output.indexOf(self.plugin.started_trigger) !=-1){
           self.setStatus(ON);
           console.log("Server started");
-          self.queryCheck = setInterval(self.query, 15000, self);
-          self.statCheck = setInterval(self.procStats, 15000, self);
+          self.queryCheck = setInterval(self.query, 5000, self);
+          self.statCheck = setInterval(self.procStats, 5000, self);
           self.usagestats = {};
           self.emit('started');
         }
