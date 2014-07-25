@@ -189,9 +189,12 @@ restserver.get('/gameservers/:id/query', function query(req, res, next) {
 
 });
 
-restserver.get('/gameservers/:id/console', function command(req, res, next) {
-    console.log("Sending command: " + req.params.command);
-	
+restserver.post('/gameservers/:id/console', function command(req, res, next) {
+    if (!restauth(req, req.params.id, "service:console")) {
+        res = unauthorized(res);
+        return next();
+    }
+
     service = servers[req.params.id];
     res.send(service.send(req.params.command))
 });
