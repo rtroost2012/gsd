@@ -62,7 +62,7 @@ GameServer.prototype.turnon = function(){
     // Shouldn't happen, but does on a crash after restart
     if (!this.status == OFF){
       // console.log("Tried to turn on but status is already : " + self.status); 
-      return;
+      return false;
     }
     
     this.plugin.preflight(this);

@@ -138,10 +138,14 @@ restserver.get('/gameservers/:id/on', function on(req, res, next) {
         res = unauthorized(res);
         return next();
     }
-    service = servers[req.params.id];
-    service.turnon();
-    res.send('ok')
 
+    service = servers[req.params.id];
+
+    if (!service.turnon()) {
+        res.send('already_on');
+    } else {
+        res.send('ok')
+    }
 });
 
 restserver.get('/gameservers/:id/off', function off(req, res, next) {
