@@ -141,10 +141,10 @@ restserver.get('/gameservers/:id/on', function on(req, res, next) {
 
     service = servers[req.params.id];
 
-    if (!service.turnon()) {
-        res.send('already_on');
-    } else {
+    if (service.turnon() != false) {
         res.send('ok')
+    } else {
+        res.send('already_on');
     }
 });
 
@@ -154,8 +154,12 @@ restserver.get('/gameservers/:id/off', function off(req, res, next) {
         return next();
     }
     service = servers[req.params.id];
-    service.turnoff();
-    res.send('ok')
+
+    if (service.turnoff() != false) {
+        res.send('ok')
+    } else {
+        res.send('already_off');
+    }
 });
 
 restserver.get('/gameservers/:id/restart', function restart(req, res, next) {

@@ -69,7 +69,6 @@ GameServer.prototype.turnon = function(){
     this.ps = pty.spawn(this.exe, this.commandline, {cwd: this.config.path});
 
     this.setStatus(STARTING);
-    
 
     this.pid = this.ps.pid
 
@@ -120,12 +119,16 @@ GameServer.prototype.turnon = function(){
 
 GameServer.prototype.turnoff = function(){
   var self = this;
-  clearTimeout(self.queryCheck);
+
+    clearTimeout(self.queryCheck);
+
   if (!self.status == OFF){
     self.setStatus(STOPPING); 
     self.kill();
+    return true;
   }else{
     self.emit('off');
+    return false;
   }
 }
 
